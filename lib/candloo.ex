@@ -3,16 +3,8 @@ defmodule Candloo do
   Documentation for Candloo.
   """
 
-  @doc """
-  Hello world.
+  def calc_candles([[{:price, _}, {:volume, _}, {:side, _}, {:time, _}] | []] = _trades, [{:timeframe, _} | []] = _opts) do
 
-  ## Examples
-
-      iex> Candloo.hello()
-      :world
-
-  """
-  def hello do
-    :world
   end
+
 end
