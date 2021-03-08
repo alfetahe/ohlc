@@ -15,18 +15,18 @@ defmodule Candloo do
   defp loop_trades([trades_head | trades_tail], [candles_head | candles_body] = candles, timeframe) do
 
     candles = cond do
-      # Appends new candle to the candles list without the processed candle.
+      # Appends new candle to the candles list without the unprocessed candle.
       candles_head.processed === false ->
         candle = create_candle(trades_head, timeframe)
-        [candle | candles_body]
+        [candle] ++ candles_body
+      # Appends updated candle to the candles list.
+      timeframe_has_candle?(candles_head, trades_head) ->
+        updated_candle = update_candle(candles_head, trades_head)
+        [updated_candle] ++ candles_body
       # Appends new candle to the candles list.
       !timeframe_has_candle?(candles_head, trades_head) ->
         candle = create_candle(trades_head, timeframe)
-        [candle | candles]
-      # Appends updated candle to the candles list.
-      true ->
-        updated_candle = update_candle(candles_head, trades_head)
-        [updated_candle, candles_body]
+        [candle] ++ candles
     end
 
     loop_trades(trades_tail, candles, timeframe)
@@ -68,12 +68,19 @@ defmodule Candloo do
 
   # Formats the trade data.
   defp format_trade_data(trade) do
-    trade = Keyword.put(trade, :time, String.to_float(trade[:time]) |> round())
-    trade = Keyword.put(trade, :price, String.to_float(trade[:price]))
-    trade = Keyword.put(trade, :volume, String.to_float(trade[:volume]))
+    trade = Keyword.put(trade, :time, format_to_float(trade[:time]) |> round())
+    trade = Keyword.put(trade, :price, format_to_float(trade[:price]))
+    trade = Keyword.put(trade, :volume, format_to_float(trade[:volume]))
 
     trade
   end
+
+  defp format_to_float(value) when is_binary(value) do
+    {float, _} = value |> String.replace(",", ".") |> String.trim() |> Float.parse()
+    float
+  end
+  defp format_to_float(value) when is_number(value) or is_integer(value), do: value / 1
+  defp format_to_float(value) when is_float(value), do: value
 
   # Returns true if trade time is bigger then last candles etime.
   defp timeframe_has_candle?(last_candle, trade) do
@@ -113,12 +120,12 @@ defmodule Candloo do
     etime = case timeframe do
       :minute ->
         end_minutes = DateTime.add(trade_time_struct, 60, :second)
-        %{candle_etime | day: trade_time_struct.day, hour: trade_time_struct.hour, minute: end_minutes.minute, second: 0}
+        %{candle_etime | day: end_minutes.day, hour: end_minutes.hour, minute: end_minutes.minute, second: 0}
       :hour ->
-        end_hour = DateTime.add(trade_time_struct, 60, :minute)
-        %{candle_etime | day: trade_time_struct.day, hour: end_hour.hour, minute: 0, second: 0}
+        end_hour = DateTime.add(trade_time_struct, 3600, :second)
+        %{candle_etime | day: end_hour.day, hour: end_hour.hour, minute: 0, second: 0}
       :day ->
-        end_day = DateTime.add(trade_time_struct, 24, :hour)
+        end_day = DateTime.add(trade_time_struct, 86_400, :second)
         %{candle_etime | day: end_day.day, hour: 0, minute: 0, second: 0}
     end
 
