@@ -5,44 +5,78 @@ defmodule Candloo do
 
   alias Candloo.Candle
 
-  @doc "Creates OHLC candles from trades."
+  @no_trade_skip_candle :skip
+  @no_trade_copy_last_close :copy_last_close
+
+  @doc """
+  Creates OHLC candles from trades.
+  """
   def create_candles(
         [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
         timeframe,
-        _opts \\ []
+        opts \\ []
       ) do
-    loop_trades(trades, [%Candle{}], timeframe)
+
+    no_trade_options = [@no_trade_skip_candle, @no_trade_copy_last_close]
+
+    no_trade_option = if (Enum.member?(no_trade_options, opts[:no_trades])) do
+      opts[:no_trades]
+    else
+      # By default were coping the last candles close price if no trades in interval.
+      @no_trade_copy_last_close
+    end
+
+    loop_trades(trades, [%Candle{}], timeframe, no_trade_option)
   end
 
   # Loops thru trades and creates or updates candles.
   defp loop_trades(
          [trades_head | trades_tail],
          [candles_head | candles_body] = candles,
-         timeframe
+         timeframe,
+         no_trade_option
        ) do
+    candle_in_timeframe = timeframe_has_candle?(candles_head, trades_head)
+
     candles =
       cond do
         # Appends new candle to the candles list without the unprocessed candle.
-        candles_head.processed === false ->
+        !candles_head.processed ->
           candle = create_candle(trades_head, timeframe)
           [candle] ++ candles_body
 
-        # Appends updated candle to the candles list.
-        timeframe_has_candle?(candles_head, trades_head) ->
+        # Updates last candle.
+        candle_in_timeframe ->
           updated_candle = update_candle(candles_head, trades_head)
           [updated_candle] ++ candles_body
 
-        # Appends new candle to the candles list.
-        !timeframe_has_candle?(candles_head, trades_head) ->
-          candle = create_candle(trades_head, timeframe)
-          [candle] ++ candles
+        # Creates new candle or candles.
+        !candle_in_timeframe ->
+          case no_trade_option do
+            @no_trade_copy_last_close ->
+              copy_last_price_loop(candles_head, trades_head, trades_tail, timeframe)
+
+              # @TODO
+
+            @no_trade_skip_candle ->
+              candle = create_candle(trades_head, timeframe)
+              [candle] ++ candles
+          end
       end
 
-    loop_trades(trades_tail, candles, timeframe)
+    loop_trades(trades_tail, candles, timeframe, no_trade_option)
   end
 
   # Returns all candles.
-  defp loop_trades(trades, candles, _timeframe) when length(trades) == 0, do: candles
+  defp loop_trades(trades, candles, _timeframe, _no_trade_option) when length(trades) == 0, do: candles
+
+  defp copy_last_price_loop(last_candle, trades_head, trades_tail, timeframe) do
+    # @TODO
+    # Kui lisada eelmise candle etime-le timeframe juurde ja kui praeguse trade-i stime on suurem siis tuleks
+    # Luua copyitud candle
+
+
+  end
 
   # Creates new candle.
   defp create_candle(trade, timeframe) do
