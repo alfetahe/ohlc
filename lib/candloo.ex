@@ -69,8 +69,9 @@ defmodule Candloo do
 
   defp copy_last_price_loop(last_candle, [trades_head | trades_tail], timeframe, worked_candles) do
 
-    trade_stime = get_time_added(timeframe, trades_head[:time], [format: :struct])
-    last_candle_etime = get_time_added(timeframe, Map.get(last_candle, :etime), [format: :struct])
+    trade_formatted = format_trade_data(trades_head)
+    trade_stime = get_time_added(timeframe, trade_formatted[:time], [format: :stamp])
+    last_candle_etime = get_time_added(timeframe, Map.get(last_candle, :etime), [format: :stamp])
 
     if (first_date_greater?(trade_stime, last_candle_etime)) do
       copied_candle = get_empty_candle(
