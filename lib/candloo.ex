@@ -67,26 +67,31 @@ defmodule Candloo do
   # Returns all candles.
   defp loop_trades(trades, candles, _timeframe, _no_trade_option) when length(trades) == 0, do: candles
 
-  defp copy_last_price_loop(last_candle, [trades_head | trades_tail], timeframe, worked_candles) do
+  defp copy_last_price_loop(last_candle, [trades_head | trades_tail] = trades, timeframe, worked_candles) do
 
     trade_formatted = format_trade_data(trades_head)
-    trade_stime = get_time_added(timeframe, trade_formatted[:time], [format: :stamp])
-    last_candle_etime = get_time_added(timeframe, Map.get(last_candle, :etime), [format: :stamp])
+    trade_stime = get_time_added(timeframe, trade_formatted[:time])
+    last_candle_etime = last_candle.etime
 
     if (first_date_greater?(trade_stime, last_candle_etime)) do
       copied_candle = get_empty_candle(
-        last_candle[:close],
+        last_candle.close,
         get_time_added(timeframe, last_candle_etime),
         get_time_added(timeframe, last_candle_etime)
       )
 
       worked_candles = [copied_candle] ++ worked_candles
 
-      copy_last_price_loop(copied_candle, trades_tail, timeframe, worked_candles)
+      copy_last_price_loop(copied_candle, trades, timeframe, worked_candles)
     else
-      [last_candle] ++ worked_candles
+      copy_last_price_loop(last_candle, trades_tail, timeframe, worked_candles)
     end
   end
+
+  defp copy_last_price_loop(last_candle, [], _timeframe, worked_candles) do
+    [last_candle] ++ worked_candles
+  end
+
 
   defp get_empty_candle(last_price, stime, etime) do
     %Candle{
@@ -214,7 +219,7 @@ defmodule Candloo do
     case opts[:format] do
       :stamp -> DateTime.to_unix(etime)
       :struct -> etime
-      nil -> etime
+      nil -> DateTime.to_unix(etime)
     end
   end
 end
