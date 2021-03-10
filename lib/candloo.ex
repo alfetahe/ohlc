@@ -18,7 +18,6 @@ defmodule Candloo do
       ) do
 
     no_trade_options = [@no_trade_skip_candle, @no_trade_copy_last_close]
-
     no_trade_option = if (Enum.member?(no_trade_options, opts[:no_trades])) do
       opts[:no_trades]
     else
@@ -31,11 +30,11 @@ defmodule Candloo do
 
   # Loops thru trades and creates or updates candles.
   defp loop_trades(
-         [trades_head | trades_tail],
+         [trades_head | trades_tail] = trades,
          [candles_head | candles_body] = candles,
          timeframe,
          no_trade_option
-       ) do
+  ) do
     candle_in_timeframe = timeframe_has_candle?(candles_head, trades_head)
 
     candles =
@@ -47,6 +46,7 @@ defmodule Candloo do
 
         # Updates last candle.
         candle_in_timeframe ->
+          IO.puts "UPPPDAATEE"
           updated_candle = update_candle(candles_head, trades_head)
           [updated_candle] ++ candles_body
 
@@ -54,10 +54,8 @@ defmodule Candloo do
         !candle_in_timeframe ->
           case no_trade_option do
             @no_trade_copy_last_close ->
-              copy_last_price_loop(candles_head, trades_head, trades_tail, timeframe)
-
-              # @TODO
-
+              copied_candles = copy_last_price_loop(candles_head, trades, timeframe, [])
+              copied_candles ++ candles
             @no_trade_skip_candle ->
               candle = create_candle(trades_head, timeframe)
               [candle] ++ candles
@@ -70,12 +68,38 @@ defmodule Candloo do
   # Returns all candles.
   defp loop_trades(trades, candles, _timeframe, _no_trade_option) when length(trades) == 0, do: candles
 
-  defp copy_last_price_loop(last_candle, trades_head, trades_tail, timeframe) do
-    # @TODO
-    # Kui lisada eelmise candle etime-le timeframe juurde ja kui praeguse trade-i stime on suurem siis tuleks
-    # Luua copyitud candle
+  defp copy_last_price_loop(last_candle, [trades_head | trades_tail], timeframe, worked_candles) do
 
+    trade_stime = get_time_added(timeframe, trades_head[:time], [format: :struct])
+    last_candle_etime = get_time_added(timeframe, Map.get(last_candle, :etime), [format: :struct])
 
+    if (first_date_greater?(trade_stime, last_candle_etime)) do
+      copied_candle = get_empty_candle(
+        last_candle[:close],
+        get_time_added(timeframe, last_candle_etime),
+        get_time_added(timeframe, last_candle_etime)
+      )
+
+      worked_candles = [copied_candle] ++ worked_candles
+
+      copy_last_price_loop(copied_candle, trades_tail, timeframe, worked_candles)
+    else
+      [last_candle] ++ worked_candles
+    end
+  end
+
+  defp get_empty_candle(last_price, stime, etime) do
+    %Candle{
+      open: last_price,
+      high: last_price,
+      low: last_price,
+      close: last_price,
+      volume: 0,
+      trades: 0,
+      stime: stime,
+      etime: etime,
+      processed: true
+    }
   end
 
   # Creates new candle.
@@ -90,7 +114,7 @@ defmodule Candloo do
       volume: trade_data_formatted[:volume],
       trades: 1,
       stime: trade_data_formatted[:time],
-      etime: get_etime(timeframe, trade_data_formatted[:time]),
+      etime: get_time_added(timeframe, trade_data_formatted[:time], [format: :stamp]),
       processed: true
     }
   end
@@ -123,19 +147,24 @@ defmodule Candloo do
     {float, _} = value |> String.replace(",", ".") |> String.trim() |> Float.parse()
     float
   end
-
   defp format_to_float(value) when is_number(value) or is_integer(value), do: value / 1
   defp format_to_float(value) when is_float(value), do: value
 
+
   # Returns true if trade time is bigger then last candles etime.
   defp timeframe_has_candle?(last_candle, trade) do
-    trade_data_formatted = format_trade_data(trade)
+    if (last_candle.etime !== 0) do
+      first_date_greater?(last_candle.etime, trade[:time])
+    else
+      false
+    end
+  end
 
-    {:ok, trade_time_struct} = trade_data_formatted[:time] |> DateTime.from_unix()
+  defp first_date_greater?(first_date, second_date) do
+    {:ok, first_date} = first_date |> format_to_float() |> round() |> DateTime.from_unix()
+    {:ok, second_date} = second_date |> format_to_float() |> round() |> DateTime.from_unix()
 
-    {:ok, last_candle_etime} = last_candle.etime |> DateTime.from_unix()
-
-    case DateTime.compare(last_candle_etime, trade_time_struct) do
+    case DateTime.compare(first_date, second_date) do
       :gt -> true
       :lt -> false
       :eq -> false
@@ -143,26 +172,27 @@ defmodule Candloo do
   end
 
   # Formats and returns etime for candles.
-  defp get_etime(timeframe, trade_time) do
-    {:ok, trade_time_struct} = trade_time |> DateTime.from_unix()
+  defp get_time_added(timeframe, timestamp, opts \\ []) do
+
+    {:ok, time_struct} = DateTime.from_unix(timestamp)
 
     candle_etime = %DateTime{
-      year: trade_time_struct.year,
-      month: trade_time_struct.month,
+      year: time_struct.year,
+      month: time_struct.month,
       day: 0,
       hour: 0,
       minute: 0,
       second: 0,
-      time_zone: trade_time_struct.time_zone,
-      zone_abbr: trade_time_struct.zone_abbr,
-      utc_offset: trade_time_struct.utc_offset,
-      std_offset: trade_time_struct.std_offset
+      time_zone: time_struct.time_zone,
+      zone_abbr: time_struct.zone_abbr,
+      utc_offset: time_struct.utc_offset,
+      std_offset: time_struct.std_offset
     }
 
     etime =
       case timeframe do
         :minute ->
-          end_minutes = DateTime.add(trade_time_struct, 60, :second)
+          end_minutes = DateTime.add(time_struct, 60, :second)
 
           %{
             candle_etime
@@ -173,14 +203,18 @@ defmodule Candloo do
           }
 
         :hour ->
-          end_hour = DateTime.add(trade_time_struct, 3600, :second)
+          end_hour = DateTime.add(time_struct, 3600, :second)
           %{candle_etime | day: end_hour.day, hour: end_hour.hour, minute: 0, second: 0}
 
         :day ->
-          end_day = DateTime.add(trade_time_struct, 86_400, :second)
+          end_day = DateTime.add(time_struct, 86_400, :second)
           %{candle_etime | day: end_day.day, hour: 0, minute: 0, second: 0}
       end
 
-    DateTime.to_unix(etime)
+    case opts[:format] do
+      :stamp -> DateTime.to_unix(etime)
+      :struct -> etime
+      nil -> etime
+    end
   end
 end
