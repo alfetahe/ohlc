@@ -5,8 +5,8 @@ defmodule Candloo do
 
   alias Candloo.Candle
 
-  @no_trade_skip_candle :skip
-  @no_trade_copy_last_close :copy_last_close
+  @no_trades_skip_candle :skip
+  @no_trades_copy_last_close :copy_last_close
 
   @doc """
   Creates OHLC candles from trades.
@@ -17,12 +17,12 @@ defmodule Candloo do
         opts \\ []
       ) do
 
-    no_trade_options = [@no_trade_skip_candle, @no_trade_copy_last_close]
+    no_trade_options = [@no_trades_skip_candle, @no_trades_copy_last_close]
     no_trade_option = if (Enum.member?(no_trade_options, opts[:no_trades])) do
       opts[:no_trades]
     else
       # By default were coping the last candles close price if no trades in interval.
-      @no_trade_copy_last_close
+      @no_trades_copy_last_close
     end
 
     loop_trades(trades, [%Candle{}], timeframe, no_trade_option)
@@ -46,17 +46,16 @@ defmodule Candloo do
 
         # Updates last candle.
         candle_in_timeframe ->
-          IO.puts "UPPPDAATEE"
           updated_candle = update_candle(candles_head, trades_head)
           [updated_candle] ++ candles_body
 
         # Creates new candle or candles.
         !candle_in_timeframe ->
           case no_trade_option do
-            @no_trade_copy_last_close ->
+            @no_trades_copy_last_close ->
               copied_candles = copy_last_price_loop(candles_head, trades, timeframe, [])
               copied_candles ++ candles
-            @no_trade_skip_candle ->
+            @no_trades_skip_candle ->
               candle = create_candle(trades_head, timeframe)
               [candle] ++ candles
           end
