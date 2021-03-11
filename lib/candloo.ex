@@ -36,27 +36,26 @@ defmodule Candloo do
   ) do
     candle_in_timeframe = timeframe_has_candle?(candles_head, trades_head)
 
-    candles =
+    [candles, trades_tail] =
       cond do
         # Appends new candle to the candles list without the unprocessed candle.
         !candles_head.processed ->
           candle = create_candle(trades_head, timeframe)
-          [candle] ++ candles_body
+          [[candle] ++ candles_body, trades_tail]
 
         # Updates last candle.
         candle_in_timeframe ->
           updated_candle = update_candle(candles_head, trades_head)
-          [updated_candle] ++ candles_body
+          [[updated_candle] ++ candles_body, trades_tail]
 
         # Creates new candle or candles.
         !candle_in_timeframe ->
           case no_trade_option do
             @no_trades_copy_last_close ->
-              copied_candles = copy_last_price_loop(candles_head, trades, timeframe, [])
-              copied_candles ++ candles
+              copy_last_price_loop([candles_head | candles_body], trades, timeframe)
             @no_trades_skip_candles ->
               candle = create_candle(trades_head, timeframe)
-              [candle] ++ candles
+              [[candle] ++ candles, trades_tail]
           end
       end
 
@@ -66,31 +65,28 @@ defmodule Candloo do
   # Returns all candles.
   defp loop_trades(trades, candles, _timeframe, _no_trade_option) when length(trades) == 0, do: candles
 
-  defp copy_last_price_loop(last_candle, [trades_head | trades_tail] = trades, timeframe, worked_candles) do
+  defp copy_last_price_loop([candles_head | _candles_body] = candles, [trades_head | trades_tail] = trades, timeframe) do
 
     trade_formatted = format_trade_data(trades_head)
-    trade_stime = get_time_added(timeframe, trade_formatted[:time])
-    last_candle_etime = last_candle.etime
+    candles_head_etime_added = get_time_added(timeframe, candles_head.etime)
 
-    if (first_date_greater?(trade_stime, last_candle_etime)) do
+    if (first_date_greater?(trade_formatted[:time], candles_head_etime_added)) do
+
       copied_candle = get_empty_candle(
-        last_candle.close,
-        get_time_added(timeframe, last_candle_etime),
-        get_time_added(timeframe, last_candle_etime)
+        candles_head.close,
+        get_time_added(timeframe, candles_head.etime),
+        get_time_added(timeframe, candles_head.etime)
       )
 
-      worked_candles = [copied_candle] ++ worked_candles
+      candles = [copied_candle] ++ candles
 
-      copy_last_price_loop(copied_candle, trades, timeframe, worked_candles)
+      copy_last_price_loop(candles, trades, timeframe)
     else
-      copy_last_price_loop(last_candle, trades_tail, timeframe, worked_candles)
+      candle = create_candle(trades_head, timeframe)
+
+      [[candle] ++ candles, trades_tail]
     end
   end
-
-  defp copy_last_price_loop(last_candle, [], _timeframe, worked_candles) do
-    [last_candle] ++ worked_candles
-  end
-
 
   defp get_empty_candle(last_price, stime, etime) do
     %Candle{
