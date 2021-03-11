@@ -5,7 +5,7 @@ defmodule Candloo do
 
   alias Candloo.Candle
 
-  @no_trades_skip_candle :skip
+  @no_trades_skip_candles :skip_no_trades
   @no_trades_copy_last_close :copy_last_close
 
   @doc """
@@ -17,9 +17,8 @@ defmodule Candloo do
         opts \\ []
       ) do
 
-    no_trade_options = [@no_trades_skip_candle, @no_trades_copy_last_close]
-    no_trade_option = if (Enum.member?(no_trade_options, opts[:no_trades])) do
-      opts[:no_trades]
+    no_trade_option = if (Enum.member?(opts, @no_trades_skip_candles)) do
+      @no_trades_skip_candles
     else
       # By default were coping the last candles close price if no trades in interval.
       @no_trades_copy_last_close
@@ -55,7 +54,7 @@ defmodule Candloo do
             @no_trades_copy_last_close ->
               copied_candles = copy_last_price_loop(candles_head, trades, timeframe, [])
               copied_candles ++ candles
-            @no_trades_skip_candle ->
+            @no_trades_skip_candles ->
               candle = create_candle(trades_head, timeframe)
               [candle] ++ candles
           end
