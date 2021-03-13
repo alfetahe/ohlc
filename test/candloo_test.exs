@@ -43,14 +43,27 @@ defmodule CandlooTest do
       ## + 1day
 
       # 11.03.2021 09:33:19
-       # [price: "10", volume: "10", time: "1615447999", side: "b",],
+       [price: "10", volume: "10", time: "1615447999", side: "b",],
+
+       # 12.03.2021 11:23:21
+       [price: "11", volume: "11", time: "1615541001", side: "b",],
+
+       # 13.03.2021 14:05:11
+       [price: "12", volume: "12", time: "1615637111", side: "b",],
+       # 13.03.2021 23:55:42
+       [price: "12.5", volume: "12.5", time: "1615672542", side: "b",],
+
+       # 14.03.2021 23:59:42
+       [price: "13", volume: "13", time: "1615759182", side: "b",],
+
+      # 15.03.2021 01:02:34
+       [price: "14", volume: "14", time: "1615762954", side: "b",],
+
+      # 16.03.2021 14:02:47
+       [price: "15", volume: "15", time: "1615896167", side: "b",],
     ]
 
-
-    candles = Candloo.create_candles(data, :hour)
-
-
-    IO.puts "HRyos"
+    candles = Candloo.create_candles(data, :minute, [:no_trades_skip])
   end
 
 end
