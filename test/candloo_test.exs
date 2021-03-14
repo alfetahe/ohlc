@@ -2,7 +2,7 @@ defmodule CandlooTest do
   use ExUnit.Case
   doctest Candloo
 
-  test "Trades  list does not contain all necessary keys" do
+  test "Trades list does not contain all necessary keys and must return error" do
     error_trade_field_missing = [
       [price: "15", volume: "15", time: "1615896167", side: "b",],
        [price: "15", volume: "15", timez: "1615896167", side: "b",],
