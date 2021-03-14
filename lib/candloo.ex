@@ -56,13 +56,32 @@ defmodule Candloo do
     keys_validated = Enum.all?(trade_fields, &(trades_head[&1]))
 
     case keys_validated do
-      true -> validate_trades(trades_body)
+      true ->
+        trade_data_validated = validate_trade_data(trades_head)
+
+        case trade_data_validated do
+          {:ok, _} -> validate_trades(trades_body)
+          {:error, msg} -> {:error, msg}
+        end
       false -> {:error, "Trades list does not contain all necessary keys"}
     end
   end
 
   defp validate_trades([]) do
     {:ok , "Trade fields have been validated."}
+  end
+
+  defp validate_trade_data(trade) do
+    price_validation = is_float(format_to_float(trade[:price]))
+    time_validation = is_float(format_to_float(trade[:time]))
+    volume_validation = is_float(format_to_float(trade[:volume]))
+    side_validation = (trade[:side] === "s" or trade[:side] === "b") || false
+
+    if (price_validation and time_validation and volume_validation and side_validation) do
+      {:ok, "Trade data_validated."}
+    else
+      {:error, "Error validating trades data: #{inspect(trade)}"}
+    end
   end
 
   # Loops thru trades and creates or updates candles.
@@ -192,6 +211,7 @@ defmodule Candloo do
   end
   defp format_to_float(value) when is_number(value) or is_integer(value), do: value / 1
   defp format_to_float(value) when is_float(value), do: value
+  defp format_to_float(value), do: {:error, "Data not formattable to float: #{value}"}
 
   defp dates_match_timeframe?(first_date, second_date, timeframe, opts \\ []) do
     if (first_date !== 0) do
