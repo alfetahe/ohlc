@@ -7,6 +7,7 @@ defmodule Candloo do
 
   @no_trades_skip_candles :skip_no_trades
   @no_trades_copy_last_close :copy_last_close
+  @timeframes [{:minute, 60}, {:hour, 3600}, {:day, 86_400}, {:week, 604_800}]
 
   @doc """
   Creates OHLC candles from trades.
@@ -24,7 +25,44 @@ defmodule Candloo do
       @no_trades_copy_last_close
     end
 
-    loop_trades(trades, [%Candle{}], timeframe, no_trade_option)
+    case validate_data(trades, timeframe) do
+      {:error, msg} -> {:error, msg}
+      {:ok, _} -> loop_trades(trades, [%Candle{}], timeframe, no_trade_option)
+    end
+  end
+
+  def validate_data(trades, timeframe) do
+    case validate_timeframe(timeframe) do
+      {:error, timeframe_error_msg} -> {:error, timeframe_error_msg}
+      {:ok, _} ->
+        trades_validated = validate_trades(trades)
+        case trades_validated do
+        {:error, trades_error_msg} -> {:error, trades_error_msg}
+        {:ok, _} -> {:ok, "Data has been validated."}
+      end
+    end
+  end
+
+  defp validate_timeframe(timeframe) do
+    case @timeframes[timeframe] do
+      nil -> {:error, "Timeframe is not defined in the modules: #{timeframe}"}
+      _ -> {:ok, "Timeframe validated."}
+    end
+  end
+
+  defp validate_trades([trades_head | trades_body]) do
+    trade_fields = [:price, :volume, :time, :side]
+
+    keys_validated = Enum.all?(trade_fields, &(trades_head[&1]))
+
+    case keys_validated do
+      true -> validate_trades(trades_body)
+      false -> {:error, "Trades list does not contain all necessary keys"}
+    end
+  end
+
+  defp validate_trades([]) do
+    {:ok , "Trade fields have been validated."}
   end
 
   # Loops thru trades and creates or updates candles.

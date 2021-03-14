@@ -2,10 +2,20 @@ defmodule CandlooTest do
   use ExUnit.Case
   doctest Candloo
 
-  test "greets the world" do
-    assert Candloo.hello() == :world
-  end
+  test "Trades  list does not contain all necessary keys" do
+    error_trade_field_missing = [
+      [price: "15", volume: "15", time: "1615896167", side: "b",],
+       [price: "15", volume: "15", timez: "1615896167", side: "b",],
+    ]
 
+    response = Candloo.create_candles(error_trade_field_missing, :minute)
+
+    case response do
+      {:error} -> assert(true)
+      {:ok, _} -> assert(false)
+      _ -> assert(false)
+    end
+  end
 
   test "testing" do
 
@@ -15,7 +25,7 @@ defmodule CandlooTest do
       # 10.03.2021 18:34:36
        [price: "1", volume: "1", time: "1615394076.927681", side: "b",],
        # 10.03.2021 18:34:56
-       [price: "1.5", volume: "1.5", time: "1615394096", side: "s",],
+       [zprice: "1.5", volume: "1.5", time: "1615394096", side: "s",],
 
        # 10.03.2021 18:35:04
        [price: "2", volume: "2", time: "1615394104", side: "b",],
@@ -63,7 +73,7 @@ defmodule CandlooTest do
        [price: "15", volume: "15", time: "1615896167", side: "b",],
     ]
 
-    candles = Candloo.create_candles(data, :minute, [:no_trades_skip])
+  #  candles = Candloo.create_candles(data, :minute, [:no_trades_skip])
   end
 
 end
