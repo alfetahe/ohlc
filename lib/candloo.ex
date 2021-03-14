@@ -27,7 +27,14 @@ defmodule Candloo do
 
     case validate_data(trades, timeframe) do
       {:error, msg} -> {:error, msg}
-      {:ok, _} -> loop_trades(trades, [%Candle{}], timeframe, no_trade_option)
+      {:ok, _} ->
+        data = %{
+          pair: opts[:pair],
+          timeframe: timeframe,
+          candles: loop_trades(trades, [%Candle{}], timeframe, no_trade_option)
+        }
+
+        {:ok, data}
     end
   end
 
