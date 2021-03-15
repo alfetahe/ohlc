@@ -57,39 +57,46 @@ defmodule Candloo do
     end
   end
 
-  defp validate_trades([trades_head | trades_body]) do
+  defp validate_trades(trades, prev_etime \\ nil)
+  defp validate_trades([trades_head | trades_body], prev_etime) do
     trade_fields = [:price, :volume, :time, :side]
 
     keys_validated = Enum.all?(trade_fields, &(trades_head[&1]))
 
     case keys_validated do
       true ->
-        trade_data_validated = validate_trade_data(trades_head)
+        trade_data_validated = validate_trade_data(trades_head, prev_etime)
 
         case trade_data_validated do
-          {:ok, _} -> validate_trades(trades_body)
+          {:ok, _} -> validate_trades(trades_body, trades_head[:time])
           {:error, msg} -> {:error, msg}
         end
       false -> {:error, "Trades list does not contain all necessary keys"}
     end
   end
-
-  defp validate_trades([]) do
+  defp validate_trades([], _prev_etime) do
     {:ok , "Trade fields have been validated."}
   end
 
-  defp validate_trade_data(trade) do
+  defp validate_trade_data(trade, prev_etime) do
     price_validation = is_float(format_to_float(trade[:price]))
     time_validation = is_float(format_to_float(trade[:time]))
     volume_validation = is_float(format_to_float(trade[:volume]))
     side_validation = (trade[:side] === "s" or trade[:side] === "b") || false
 
-    if (price_validation and time_validation and volume_validation and side_validation) do
-      {:ok, "Trade data_validated."}
+    etime_greater = cond  do
+      prev_etime === :nil -> true
+      time_validation -> (format_to_float(trade[:time]) > format_to_float(prev_etime)) || false
+      true -> false
+    end
+
+    if (price_validation and time_validation and volume_validation and side_validation and etime_greater) do
+      {:ok, "Trade data validated."}
     else
-      {:error, "Error validating trades data: #{inspect(trade)}"}
+      {:error, "Error validating trades data. Data types wrong or not sequenced: #{inspect(trade)}"}
     end
   end
+
 
   # Loops thru trades and creates or updates candles.
   defp loop_trades(
