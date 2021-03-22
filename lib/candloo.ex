@@ -96,7 +96,7 @@ defmodule Candloo do
     etime_greater =
       cond do
         prev_etime === nil -> true
-        time_validation -> format_to_float(trade[:time]) > format_to_float(prev_etime) || false
+        time_validation -> format_to_float(trade[:time]) >= format_to_float(prev_etime) || false
         true -> false
       end
 
@@ -312,10 +312,10 @@ defmodule Candloo do
 
   defp etime_minute_worker(time_struct, unfinished_time_struct, opts) do
     worked_time_struct =
-      if time_struct.second !== 0 do
-        DateTime.add(time_struct, 60, :second)
-      else
+      if time_struct.second === 0 do
         time_struct
+      else
+        DateTime.add(time_struct, 60, :second)
       end
 
     worked_time_struct =
@@ -336,10 +336,10 @@ defmodule Candloo do
 
   defp etime_hour_worker(time_struct, unfinished_time_struct, opts) do
     worked_time_struct =
-      if time_struct.second !== 0 and time_struct.minute !== 0 do
-        DateTime.add(time_struct, 3600, :second)
-      else
+      if time_struct.second === 0 and time_struct.minute === 0 do
         time_struct
+      else
+        DateTime.add(time_struct, 3600, :second)
       end
 
     worked_time_struct =
@@ -360,10 +360,10 @@ defmodule Candloo do
 
   defp etime_day_worker(time_struct, unfinished_time_struct, opts) do
     worked_time_struct =
-      if time_struct.second !== 0 and time_struct.minute !== 0 do
-        DateTime.add(time_struct, 86_400, :second)
-      else
+      if time_struct.second === 0 and time_struct.minute === 0 do
         time_struct
+      else
+        DateTime.add(time_struct, 86_400, :second)
       end
 
     worked_time_struct =
