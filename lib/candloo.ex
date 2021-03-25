@@ -158,7 +158,7 @@ defmodule Candloo do
          timeframe
        ) do
     trade_formatted = format_trade_data(trades_head)
-    candles_head_etime_added = get_etime_rounded(timeframe, candles_head.etime, type: :add)
+    candles_head_etime_added = get_etime_rounded(candles_head.etime, timeframe, type: :add)
 
     date_check =
       dates_match_timeframe?(
@@ -216,7 +216,7 @@ defmodule Candloo do
       volume: trade[:volume],
       trades: 1,
       stime: trade[:time],
-      etime: get_etime_rounded(timeframe, trade[:time]),
+      etime: get_etime_rounded(trade[:time], timeframe),
       processed: true
     }
   end
@@ -254,8 +254,8 @@ defmodule Candloo do
 
   defp dates_match_timeframe?(first_date, second_date, timeframe, opts \\ []) do
     if first_date !== 0 do
-      first_date = get_etime_rounded(timeframe, first_date, format: :struct)
-      second_date = get_etime_rounded(timeframe, second_date, format: :struct)
+      first_date = get_etime_rounded(first_date, timeframe, format: :struct)
+      second_date = get_etime_rounded(second_date, timeframe, format: :struct)
 
       case DateTime.compare(first_date, second_date) do
         :gt ->
@@ -277,7 +277,7 @@ defmodule Candloo do
   end
 
   # Formats and returns etime for candles.
-  defp get_etime_rounded(timeframe, timestamp, opts \\ []) do
+  def get_etime_rounded(timestamp, timeframe, opts \\ []) do
     timestamp = timestamp |> format_to_float() |> round()
 
     {:ok, time_struct} = DateTime.from_unix(timestamp)

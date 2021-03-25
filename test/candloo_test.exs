@@ -85,7 +85,7 @@ defmodule CandlooTest do
       [price: "12", volume: "13", time: "1616436352", side: "s"],
       [price: "11", volume: "17", time: "1616436355", side: "b"],
       [price: "11", volume: "11", time: "1616436358", side: "s"],
-      [price: "11.11", volume: "1125", time: "1616436359", side: "b"],
+      [price: "11.11", volume: "1125", time: "1616436359", side: "b"]
     ]
   end
 
@@ -93,7 +93,7 @@ defmodule CandlooTest do
     items = [
       [price: "15", volume: "0.2", time: "1616436287", side: "s"],
       [price: "17", volume: "0.6", time: "1616436299", side: "b"],
-      [price: "17", volume: "0.6", time: "1616436300", side: "b"],
+      [price: "17", volume: "0.6", time: "1616436300", side: "b"]
     ]
 
     items ++ single_minute_candle_data()
@@ -109,7 +109,7 @@ defmodule CandlooTest do
       [price: "119", volume: "0.002", time: "1616439119", side: "b"],
       [price: "119.654", volume: "0.89", time: "1616439120", side: "s"],
       [price: "129.32", volume: "1.42", time: "1616439302", side: "s"],
-      [price: "130.0", volume: "1", time: "1616439600", side: "b"],
+      [price: "130.0", volume: "1", time: "1616439600", side: "b"]
     ]
   end
 
@@ -123,7 +123,7 @@ defmodule CandlooTest do
       [price: "2222", volume: "8", time: "1616441940", side: "b"],
       [price: "1234", volume: "8", time: "1616441952", side: "s"],
       [price: "44", volume: "7", time: "1616442512", side: "s"],
-      [price: "98.4", volume: "0.5", time: "1616442679", side: "s"],
+      [price: "98.4", volume: "0.5", time: "1616442679", side: "s"]
     ]
   end
 
@@ -150,6 +150,4 @@ defmodule CandlooTest do
       [price: "15", volume: "15", timez: "1615896169", side: "b"]
     ]
   end
-
-
 end
