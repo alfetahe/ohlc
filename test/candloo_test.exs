@@ -69,7 +69,6 @@ defmodule CandlooTest do
     assert Enum.at(data[:candles], 0).close === 11.11
   end
 
-
   # Success return data items.
   def single_minute_candle_data do
     [
