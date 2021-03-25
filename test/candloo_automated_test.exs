@@ -10,13 +10,13 @@ defmodule CandlooAutomatedTest do
   @max_incrementor 45
 
   test "Test minute single candle 1" do
-    max_price = 189.2
-    max_volume = 94
-    timeframe_multiplier = 1
+    assert(test_single_candle(:minute, 189.2, 94, 1))
+  end
 
+  def test_single_candle(timeframe, max_price, max_volume, timeframe_multiplier) do
     trades =
       generate_single_candle_trades(
-        @timeframes[:minute],
+        @timeframes[timeframe],
         max_price,
         max_volume,
         timeframe_multiplier
@@ -24,16 +24,14 @@ defmodule CandlooAutomatedTest do
 
     {:ok, data} = Candloo.create_candles(trades, :minute)
 
-    assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0).high === max_price and
-        Enum.at(data[:candles], 0).low === max_price - (@max_incrementor - 1) and
-        Enum.at(data[:candles], 0).open === max_price and
-        Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
-        Enum.at(data[:candles], 0).stime === Enum.at(trades, 0)[:time] and
-        Enum.at(data[:candles], 0).etime ===
-          Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], :minute, format: :stamp)
-    )
+    length(data[:candles]) === 1 and
+      Enum.at(data[:candles], 0).high === max_price and
+      Enum.at(data[:candles], 0).low === max_price - (@max_incrementor - 1) and
+      Enum.at(data[:candles], 0).open === max_price and
+      Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
+      Enum.at(data[:candles], 0).stime === Enum.at(trades, 0)[:time] and
+      Enum.at(data[:candles], 0).etime ===
+        Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], :minute, format: :stamp)
   end
 
   def generate_single_candle_trades(timeframe, max_price, max_volume, timeframe_multiplier \\ 1) do
