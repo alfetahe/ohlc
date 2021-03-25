@@ -13,7 +13,19 @@ defmodule CandlooAutomatedTest do
     assert(test_single_candle(:minute, 189.2, 94, 1))
   end
 
+  test "Test hourly single candle 1" do
+    assert(test_single_candle(:hour, 1533, 24, 1))
+  end
+
+  test "Test daily single candle 1" do
+    assert(test_single_candle(:day, 189.2, 94, 1))
+  end
+
   def test_single_candle(timeframe, max_price, max_volume, timeframe_multiplier) do
+    # convert to float
+    max_price = max_price / 1
+    max_volume = max_volume / 1
+
     trades =
       generate_single_candle_trades(
         @timeframes[timeframe],
@@ -22,7 +34,7 @@ defmodule CandlooAutomatedTest do
         timeframe_multiplier
       )
 
-    {:ok, data} = Candloo.create_candles(trades, :minute)
+    {:ok, data} = Candloo.create_candles(trades, timeframe)
 
     length(data[:candles]) === 1 and
       Enum.at(data[:candles], 0).high === max_price and
@@ -31,7 +43,7 @@ defmodule CandlooAutomatedTest do
       Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
       Enum.at(data[:candles], 0).stime === Enum.at(trades, 0)[:time] and
       Enum.at(data[:candles], 0).etime ===
-        Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], :minute, format: :stamp)
+        Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
   end
 
   def generate_single_candle_trades(timeframe, max_price, max_volume, timeframe_multiplier \\ 1) do
@@ -53,7 +65,7 @@ defmodule CandlooAutomatedTest do
       [
         price: max_price + numb,
         volume: max_volume + numb,
-        time: base_timestamp - timestamp_addition * numb,
+        time: base_timestamp - timestamp_addition * numb + 1,
         side: side
       ]
     end)
