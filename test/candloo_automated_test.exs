@@ -4,7 +4,7 @@ defmodule CandlooAutomatedTest do
 
   @timeframes [{:minute, 60}, {:hour, 3600}, {:day, 86_400}, {:week, 604_800}]
 
-  # 2021-24-03 00:00:01 UTC +0
+  # 2021-22-03 00:00:01 UTC +0
   @base_timestamp 1616371201
 
   @max_incrementor 45
