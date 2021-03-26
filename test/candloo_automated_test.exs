@@ -25,7 +25,6 @@ defmodule CandlooAutomatedTest do
     assert(test_single_candle(:hour, 1533, 24, 1))
   end
 
-
   test "Test hourly multiple candles" do
     Enum.all?(1..100, &(test_single_candle(:hour, 2 * &1, 15 * &1, &1))) |> assert()
   end
