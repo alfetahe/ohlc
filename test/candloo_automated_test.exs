@@ -5,7 +5,7 @@ defmodule CandlooAutomatedTest do
   @timeframes [{:minute, 60}, {:hour, 3600}, {:day, 86_400}, {:week, 604_800}]
 
   # 2021-24-03 00:00:01 UTC +0
-  @base_timestamp 1616544001
+  @base_timestamp 1616371201
 
   @max_incrementor 45
 
@@ -22,7 +22,7 @@ defmodule CandlooAutomatedTest do
   end
 
   test "Test weekly single candle 1" do
-  #  assert(test_single_candle(:week, 19232, 15, 1))
+    assert(test_single_candle(:week, 19232, 15, 1))
   end
 
   def test_single_candle(timeframe, max_price, max_volume, timeframe_multiplier) do
