@@ -9,20 +9,46 @@ defmodule CandlooAutomatedTest do
 
   @max_incrementor 45
 
-  test "Test minute single candle 1" do
+  # Minute Candles
+
+  test "Test minute single candle" do
     assert(test_single_candle(:minute, 189.2, 94, 1))
   end
 
-  test "Test hourly single candle 1" do
+  test "Test minute multiple candles" do
+    Enum.all?(1..1000, &(test_single_candle(:minute, 13.2 * &1, 23.4 * &1, &1))) |> assert()
+  end
+
+  # Hourly candles
+
+  test "Test hourly single candle" do
     assert(test_single_candle(:hour, 1533, 24, 1))
   end
 
-  test "Test daily single candle 1" do
+
+  test "Test hourly multiple candles" do
+    Enum.all?(1..100, &(test_single_candle(:hour, 2 * &1, 15 * &1, &1))) |> assert()
+  end
+
+
+  # Daily candles
+
+  test "Test daily single candle" do
     assert(test_single_candle(:day, 88.2, 12, 1))
   end
 
-  test "Test weekly single candle 1" do
+  test "Test daily multiple candles" do
+    Enum.all?(1..100, &(test_single_candle(:day, 0.2 * &1, 2430 * &1, &1))) |> assert()
+  end
+
+  # Weekly candles
+
+  test "Test weekly single candle" do
     assert(test_single_candle(:week, 19232, 15, 1))
+  end
+
+  test "Test weekly multiple candle" do
+    Enum.all?(1..2, &(test_single_candle(:week, 47342 * &1, 0.003 * &1, &1))) |> assert()
   end
 
   def test_single_candle(timeframe, max_price, max_volume, timeframe_multiplier) do
