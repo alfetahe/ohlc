@@ -249,8 +249,8 @@ defmodule Candloo do
     %{
       candle
       | close: trade[:price],
-        high: max(trade[:price], candle.high),
-        low: min(trade[:price], candle.low),
+        high: Decimal.max(trade[:price], candle.high) |> Decimal.to_string,
+        low: Decimal.min(trade[:price], candle.low) |> Decimal.to_string,
         volume: Decimal.add(decimal_trade_volume, decimal_candle_volume) |> Decimal.to_string(),
         trades: 1 + candle.trades,
         processed: true
