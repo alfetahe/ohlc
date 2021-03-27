@@ -88,25 +88,41 @@ defmodule Candloo do
   end
 
   defp validate_trade_data(trade, prev_etime) do
-    price_validation = is_float(format_to_float(trade[:price]))
-    time_validation = is_float(format_to_float(trade[:time]))
-    volume_validation = is_float(format_to_float(trade[:volume]))
-    side_validation = trade[:side] === "s" or trade[:side] === "b" || false
+    # price_validation = case trade[:price] |> create_decimal_string() do
+    #   {:error, _} -> false
+    #   _ -> trade[:price] |> create_decimal_string()
 
-    etime_greater =
-      cond do
-        prev_etime === nil -> true
-        time_validation -> format_to_float(trade[:time]) >= format_to_float(prev_etime) || false
-        true -> false
-      end
 
-    if price_validation and time_validation and volume_validation and side_validation and
-         etime_greater do
-      {:ok, "Trade data validated."}
-    else
-      {:error,
-       "Error validating trades data. Data types wrong or not sequenced: #{inspect(trade)}"}
-    end
+    # volume_validation = case trade[:volume] |> create_decimal_string() do
+    #   {:error, _} -> false
+    #   _ -> trade[:volume] |> create_decimal_string()
+
+    # time_validation = case trade[:time] |> create_decimal_string() do
+    #   {:error, _} -> false
+    #   _ -> trade[:time] |> create_decimal_string()
+
+    # side_validation = trade[:side] === "s" or trade[:side] === "b" || false
+
+    # if price_validation and time_validation and volume_validation and side_validation
+
+    # else
+    #   {:error, "Error validating trades data. Data types wrong or not sequenced: #{inspect(trade)}"}
+    # end
+
+    # etime_greater =
+    #   cond do
+    #     prev_etime === nil -> true
+    #     time_validation -> case Decimal.compare() do
+    #       format_to_float(trade[:time]) >= format_to_float(prev_etime) || false
+
+    #     end
+    #     true -> false
+    #   end
+
+    # if price_validation and time_validation and volume_validation and side_validation and
+    #      etime_greater do
+    #   {:ok, "Trade data validated."}
+      {:ok ,"test"}
   end
 
   # Loops thru trades and creates or updates candles.
@@ -223,12 +239,15 @@ defmodule Candloo do
 
   # Returns updated candle.
   defp update_candle(candle, trade) do
+    {:ok , decimal_trade_volume} = Decimal.cast(trade[:volume])
+    {:ok , decimal_candle_volume} = Decimal.cast(candle.volume)
+
     %{
       candle
       | close: trade[:price],
         high: max(trade[:price], candle.high),
         low: min(trade[:price], candle.low),
-        volume: trade[:volume] + candle.volume,
+        volume: Decimal.add(decimal_trade_volume, decimal_candle_volume) |> Decimal.to_string(),
         trades: 1 + candle.trades,
         processed: true
     }
@@ -237,10 +256,23 @@ defmodule Candloo do
   # Formats the trade data.
   defp format_trade_data(trade) do
     trade = Keyword.put(trade, :time, format_to_float(trade[:time]) |> round())
-    trade = Keyword.put(trade, :price, format_to_float(trade[:price]))
-    trade = Keyword.put(trade, :volume, format_to_float(trade[:volume]))
+    trade = Keyword.put(trade, :price, create_decimal_string(trade[:price]))
+    trade = Keyword.put(trade, :volume, create_decimal_string(trade[:volume]))
 
     trade
+  end
+
+  def create_decimal_string(value) when is_binary(value) do
+    case value |> String.replace(",", ".") |> String.trim() |> Decimal.cast do
+      {:ok, decimal} -> Decimal.round(decimal, 4) |> Decimal.to_string()
+      :error -> {:error,  "Could not convert value to decimal"}
+    end
+  end
+
+  def create_decimal_string(value) do
+    {:ok, decimal} = Decimal.cast(value)
+
+    Decimal.round(decimal, 4) |> Decimal.to_string()
   end
 
   defp format_to_float(value) when is_binary(value) do
