@@ -7,12 +7,10 @@ defmodule CandlooAutomatedTest do
   # 2021-22-03 00:00:00 UTC +0
   @base_timestamp 1_616_371_200
 
-  @max_incrementor 45
-
   # Minute Candles
 
   test "Test minute single candle" do
-    assert(test_single_candle(:minute, 189.2, 368, 94, 0))
+    assert(test_single_candle(:minute, 172.2, 368, 94, 0))
   end
 
   # test "Test minute multiple candles" do
@@ -68,30 +66,46 @@ defmodule CandlooAutomatedTest do
     {:ok, data} = Candloo.create_candles(trades, timeframe)
 
     length(data[:candles]) === 1 and
-      Enum.at(data[:candles], 0).high === max_price and
-      Enum.at(data[:candles], 0).low === max_price - (@max_incrementor - 1) and
-      Enum.at(data[:candles], 0).open === max_price and
+      Enum.at(data[:candles], 0).high === max_price |> Decimal.to_string() and
+      Enum.at(data[:candles], 0).low === min_price |> Decimal.to_string() and
+      Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
       Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
+      Enum.at(data[:candles], 0).trades === length(trades) and
+      Enum.at(data[:candles], 0).volume ===
+        Decimal.mult(@timeframes[timeframe], volume) |> Decimal.round(4) |> Decimal.to_string() and
       Enum.at(data[:candles], 0).stime === Enum.at(trades, 0)[:time] and
       Enum.at(data[:candles], 0).etime ===
         Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
   end
 
-  def generate_single_candle_trades(timeframe, min_price, max_price, volume, timeframe_multiplier \\ 1) do
+  def generate_single_candle_trades(
+        timeframe,
+        min_price,
+        max_price,
+        volume,
+        timeframe_multiplier \\ 1
+      ) do
     price_range = Decimal.sub(max_price, min_price)
 
-    price_to_add = Decimal.div(price_range, timeframe) |> Decimal.round(4)
-
-    timestamp_multipled = @base_timestamp + (timeframe * timeframe_multiplier)
+    timestamp_multipled = @base_timestamp + timeframe * timeframe_multiplier
 
     Enum.map(1..timeframe, fn numb ->
       # Uneven number means selling and even buying side.
-      side = case rem(numb, 2) do
+      side =
+        case rem(numb, 2) do
           1 -> "s"
           0 -> "b"
-      end
+        end
 
-      price = Decimal.mult(price_to_add, numb) |> Decimal.round(4) |> Decimal.to_string
+      price =
+        if numb !== timeframe do
+          Decimal.div(price_range, numb)
+          |> Decimal.round(4)
+          |> Decimal.add(min_price)
+          |> Decimal.to_string()
+        else
+          min_price |> Decimal.to_string()
+        end
 
       [
         price: price,
