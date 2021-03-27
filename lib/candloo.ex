@@ -88,41 +88,45 @@ defmodule Candloo do
   end
 
   defp validate_trade_data(trade, prev_etime) do
-    # price_validation = case trade[:price] |> create_decimal_string() do
-    #   {:error, _} -> false
-    #   _ -> trade[:price] |> create_decimal_string()
+    price_validation = case trade[:price] |> create_decimal_string() do
+      {:error, _} -> false
+      _ -> true
+    end
 
+    volume_validation = case trade[:volume] |> create_decimal_string() do
+      {:error, _} -> false
+      _ -> true
+    end
 
-    # volume_validation = case trade[:volume] |> create_decimal_string() do
-    #   {:error, _} -> false
-    #   _ -> trade[:volume] |> create_decimal_string()
+    time_validation = case trade[:time] |> create_decimal_string() do
+      {:error, _} -> false
+      _ -> trade[:time] |> create_decimal_string()
+    end
 
-    # time_validation = case trade[:time] |> create_decimal_string() do
-    #   {:error, _} -> false
-    #   _ -> trade[:time] |> create_decimal_string()
+    side_validation = trade[:side] === "s" or trade[:side] === "b" || false
 
-    # side_validation = trade[:side] === "s" or trade[:side] === "b" || false
+    if (price_validation and is_binary(time_validation) and volume_validation and side_validation) do
+      etime_greater = cond do
+        prev_etime === nil -> true
+        time_validation ->
+          {:ok, decimal_trade_time} = Decimal.cast(time_validation)
+          {:ok, decimal_prev_etime} = Decimal.cast(prev_etime)
+          case Decimal.compare(decimal_trade_time, decimal_prev_etime) do
+            :gt -> true
+            :eq -> true
+            :lt -> false
+          end
+        true -> false
+      end
 
-    # if price_validation and time_validation and volume_validation and side_validation
-
-    # else
-    #   {:error, "Error validating trades data. Data types wrong or not sequenced: #{inspect(trade)}"}
-    # end
-
-    # etime_greater =
-    #   cond do
-    #     prev_etime === nil -> true
-    #     time_validation -> case Decimal.compare() do
-    #       format_to_float(trade[:time]) >= format_to_float(prev_etime) || false
-
-    #     end
-    #     true -> false
-    #   end
-
-    # if price_validation and time_validation and volume_validation and side_validation and
-    #      etime_greater do
-    #   {:ok, "Trade data validated."}
-      {:ok ,"test"}
+      if (etime_greater) do
+        {:ok, "Trade data has been validated."}
+      else
+        {:error, "Error validating trades data. Data not sequenced correctly: #{inspect(trade)}"}
+      end
+    else
+      {:error, "Error validating trades data. Data types wrong: #{inspect(trade)}"}
+    end
   end
 
   # Loops thru trades and creates or updates candles.
