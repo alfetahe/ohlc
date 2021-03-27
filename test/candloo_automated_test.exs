@@ -10,22 +10,22 @@ defmodule CandlooAutomatedTest do
   # Minute Candles
 
   test "Test minute single candle" do
-    assert(test_single_candle(:minute, 172.2, 368, 94, 0))
+    assert(test_single_candle(:minute, 172.2, 368, 94.3, 0))
   end
 
-  # test "Test minute multiple candles" do
-  #   Enum.all?(1..1000, &test_single_candle(:minute, 133.1 * &1, 23.4 * &1, &1)) |> assert()
-  # end
+  test "Test minute multiple candles" do
+    Enum.all?(0..1000, &test_single_candle(:minute, 83 + &1, 156 + &1, 2 + &1, &1)) |> assert()
+  end
 
-  # # Hourly candles
+  # Hourly candles
 
-  # test "Test hourly single candle" do
-  #   assert(test_single_candle(:hour, 1533, 24, 1))
-  # end
+  test "Test hourly single candle" do
+    assert(test_single_candle(:hour, 1533.45, 4893.232, 1.6, 0))
+  end
 
-  # test "Test hourly multiple candles" do
-  #   Enum.all?(1..100, &test_single_candle(:hour, 48 * &1, 15 * &1, &1)) |> assert()
-  # end
+  test "Test hourly multiple candles" do
+    Enum.all?(0..100, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1)) |> assert()
+  end
 
   # # Daily candles
 
@@ -48,6 +48,9 @@ defmodule CandlooAutomatedTest do
   # end
 
   def test_single_candle(timeframe, min_price, max_price, volume, timeframe_multiplier) do
+    {:ok, volume} = Decimal.cast(volume)
+    volume = Decimal.round(volume, 4) |> Decimal.to_string
+
     {:ok, min_price} = Decimal.cast(min_price)
     min_price = Decimal.round(min_price, 4)
 
