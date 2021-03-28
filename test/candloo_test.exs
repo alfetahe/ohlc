@@ -48,25 +48,25 @@ defmodule CandlooTest do
   test "First candles high = 167.5000" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).high === "167.5000"
+    assert Enum.at(data[:candles], 0).high === 167.5
   end
 
   test "First candles low = 0.3000" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).low === "0.3000"
+    assert Enum.at(data[:candles], 0).low === 0.3
   end
 
   test "First candles open = 15.5000" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).open === "15.0000"
+    assert Enum.at(data[:candles], 0).open === 15.0
   end
 
   test "First candles close = 11.1100" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).close === "11.1100"
+    assert Enum.at(data[:candles], 0).close === 11.11
   end
 
   # Success return data items.
