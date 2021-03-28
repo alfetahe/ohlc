@@ -17,21 +17,21 @@ defmodule CandlooAutomatedTest do
     Enum.all?(0..1000, &test_single_candle(:minute, 83 + &1, 156 + &1, 2 + &1, &1)) |> assert()
   end
 
-  # # Hourly candles
+  # Hourly candles
 
   test "Test hourly single candle" do
     assert(test_single_candle(:hour, 1533.45, 4893.232, 1.6, 0))
   end
 
   test "Test hourly multiple candles" do
-    Enum.all?(0..100, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1)) |> assert()
+    Enum.all?(0..10, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1)) |> assert()
   end
 
-  # # Daily candles
+  # Daily candles
 
-  # test "Test daily single candle" do
-  #   assert(test_single_candle(:day, 88.2, 12, 1))
-  # end
+  test "Test daily single candle" do
+    assert(test_single_candle(:day, 88.2, 112, 4.2, 0))
+  end
 
   # test "Test daily multiple candles" do
   #   Enum.all?(1..100, &test_single_candle(:day, 142.2 * &1, 2430 * &1, &1)) |> assert()
@@ -64,7 +64,7 @@ defmodule CandlooAutomatedTest do
 
     {:ok, data} = Candloo.create_candles(trades, timeframe)
 
-    volume_to_check = (@timeframes[timeframe] * volume)
+    volume_to_check = ((@timeframes[timeframe] / 10 |> trunc()) * volume)
     volume_to_check = is_float(volume_to_check) && Float.round(volume_to_check, 4) || volume_to_check
 
     statement = length(data[:candles]) === 1 and
@@ -76,7 +76,6 @@ defmodule CandlooAutomatedTest do
       Enum.at(data[:candles], 0).volume === volume_to_check and
       Enum.at(data[:candles], 0).stime === Enum.at(trades, 0)[:time] and
       Enum.at(data[:candles], 0).etime === Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
-
   end
 
   def generate_single_candle_trades(
@@ -90,7 +89,11 @@ defmodule CandlooAutomatedTest do
 
     timestamp_multipled = @base_timestamp + timeframe * timeframe_multiplier
 
-    Enum.map(1..timeframe, fn numb ->
+    items_to_loop = timeframe / 10 |> trunc()
+
+    Enum.map(1..items_to_loop, fn numb ->
+      numb_multiplied = numb * 10
+
       # Uneven number means selling and even buying side.
       side =
         case rem(numb, 2) do
@@ -99,10 +102,10 @@ defmodule CandlooAutomatedTest do
         end
 
       price =
-        if numb !== timeframe do
-          (price_range / numb) + min_price |> Float.round(4)
-        else
-          min_price
+        cond do
+          numb === 1 -> max_price
+          numb_multiplied !== timeframe -> (price_range / numb_multiplied) + min_price |> Float.round(4)
+          true -> min_price
         end
 
       price = is_float(price) && Float.round(price, 4) || price
@@ -111,7 +114,7 @@ defmodule CandlooAutomatedTest do
       [
         price: price,
         volume: volume,
-        time: timestamp_multipled + numb,
+        time: timestamp_multipled + numb_multiplied,
         side: side
       ]
     end)
