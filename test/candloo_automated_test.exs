@@ -13,19 +13,19 @@ defmodule CandlooAutomatedTest do
     assert(test_single_candle(:minute, 172.2, 368, 94.3, 0))
   end
 
-  # test "Test minute multiple candles" do
-  #   Enum.all?(0..1000, &test_single_candle(:minute, 83 + &1, 156 + &1, 2 + &1, &1)) |> assert()
-  # end
+  test "Test minute multiple candles" do
+    Enum.all?(0..1000, &test_single_candle(:minute, 83 + &1, 156 + &1, 2 + &1, &1)) |> assert()
+  end
 
   # # Hourly candles
 
-  # test "Test hourly single candle" do
-  #   assert(test_single_candle(:hour, 1533.45, 4893.232, 1.6, 0))
-  # end
+  test "Test hourly single candle" do
+    assert(test_single_candle(:hour, 1533.45, 4893.232, 1.6, 0))
+  end
 
-  # test "Test hourly multiple candles" do
-  #   Enum.all?(0..100, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1)) |> assert()
-  # end
+  test "Test hourly multiple candles" do
+    Enum.all?(0..100, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1)) |> assert()
+  end
 
   # # Daily candles
 
@@ -49,8 +49,9 @@ defmodule CandlooAutomatedTest do
 
   def test_single_candle(timeframe, min_price, max_price, volume, timeframe_multiplier) do
     # Create floats.
-    min_price = min_price / 1
-    max_price = max_price / 1
+    min_price = is_float(min_price) && Float.round(min_price, 4) || min_price / 1
+    max_price = is_float(max_price) && Float.round(max_price, 4) || max_price / 1
+    volume = is_float(volume) && Float.round(volume, 4) || volume / 1
 
     trades =
       generate_single_candle_trades(
@@ -63,15 +64,19 @@ defmodule CandlooAutomatedTest do
 
     {:ok, data} = Candloo.create_candles(trades, timeframe)
 
-    length(data[:candles]) === 1 and
-      Enum.at(data[:candles], 0).high === max_price |> Float.round(4) and
-      Enum.at(data[:candles], 0).low === min_price |> Float.round(4) and
+    volume_to_check = (@timeframes[timeframe] * volume)
+    volume_to_check = is_float(volume_to_check) && Float.round(volume_to_check, 4) || volume_to_check
+
+    statement = length(data[:candles]) === 1 and
+      Enum.at(data[:candles], 0).high === max_price and
+      Enum.at(data[:candles], 0).low === min_price and
       Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
       Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
       Enum.at(data[:candles], 0).trades === length(trades) and
-      Enum.at(data[:candles], 0).volume === (@timeframes[timeframe] * volume) |> Float.round(4) and
+      Enum.at(data[:candles], 0).volume === volume_to_check and
       Enum.at(data[:candles], 0).stime === Enum.at(trades, 0)[:time] and
       Enum.at(data[:candles], 0).etime === Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
+
   end
 
   def generate_single_candle_trades(
@@ -99,6 +104,9 @@ defmodule CandlooAutomatedTest do
         else
           min_price
         end
+
+      price = is_float(price) && Float.round(price, 4) || price
+      volume = is_float(volume) && Float.round(volume, 4) || volume
 
       [
         price: price,
