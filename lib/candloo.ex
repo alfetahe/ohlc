@@ -226,9 +226,9 @@ defmodule Candloo do
     %{
       candle
       | close: trade[:price],
-        high: max(trade[:price], candle.high),
-        low: min(trade[:price], candle.low),
-        volume: trade[:volume] + candle.volume,
+        high: max(trade[:price], candle.high) |> Float.round(4),
+        low: min(trade[:price], candle.low) |> Float.round(4),
+        volume: trade[:volume] + candle.volume |> Float.round(4),
         trades: 1 + candle.trades,
         processed: true
     }
@@ -241,19 +241,6 @@ defmodule Candloo do
     trade = Keyword.put(trade, :volume, format_to_float(trade[:volume]) |> Float.round(4))
 
     trade
-  end
-
-  def create_decimal_string(value) when is_binary(value) do
-    case value |> String.replace(",", ".") |> String.trim() |> Decimal.cast() do
-      {:ok, decimal} -> Decimal.round(decimal, 4) |> Decimal.to_string()
-      :error -> {:error, "Could not convert value to decimal"}
-    end
-  end
-
-  def create_decimal_string(value) do
-    {:ok, decimal} = Decimal.cast(value)
-
-    Decimal.round(decimal, 4) |> Decimal.to_string()
   end
 
   defp format_to_float(value) when is_binary(value) do
