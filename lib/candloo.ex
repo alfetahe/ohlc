@@ -168,10 +168,13 @@ defmodule Candloo do
       )
 
     cond  do
-      date_check === :eq ->
-         candle = create_candle(trade_formatted, timeframe)
+      # date_check === :eq ->
+      #    candle = create_candle(trade_formatted, timeframe)
 
-      [[candle] ++ candles, trades_tail]
+      # [[candle] ++ candles, trades_tail]
+
+      date_check === :eq or date_check === :lt ->
+        [candles, trades_tail]
 
       date_check === :gt ->
         copied_candle =
@@ -185,8 +188,8 @@ defmodule Candloo do
 
         copy_or_create_loop(candles, trades, timeframe)
 
-      date_check === :lt ->
-        [candles, trades_tail]
+      # date_check === :lt ->
+      #   [candles, trades_tail]
     end
   end
 
@@ -363,13 +366,13 @@ defmodule Candloo do
 
   defp etime_week_worker(time_struct, unfinished_time_struct, opts) do
     day_of_week = DateTime.to_date(time_struct) |> Date.day_of_week()
-    days_to_calc = 7 - day_of_week
+    days_to_calc = 7 - day_of_week + 1
 
     worked_time_struct =
-      if days_to_calc !== 0 do
-        DateTime.add(time_struct, 86_400 * days_to_calc, :second)
-      else
+      if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 and days_to_calc === 7 do
         time_struct
+      else
+        DateTime.add(time_struct, 86_400 * days_to_calc, :second)
       end
 
     worked_time_struct =
