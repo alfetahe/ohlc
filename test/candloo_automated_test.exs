@@ -37,14 +37,14 @@ defmodule CandlooAutomatedTest do
     Enum.all?(0..3, &test_single_candle(:day, 142.2 + &1, 369.23 + &1, 0.3 + &1, &1, 100)) |> assert()
   end
 
-  # # Weekly candles
+  # # # Weekly candles
 
   test "Test weekly single candle" do
     assert(test_single_candle(:week, 0.23, 0.42, 156.65, 0, 100))
   end
 
   test "Test weekly multiple candle" do
-  #  Enum.all?(0..1, &test_single_candle(:week, 0.14 + &1, 0.68 + &1, 467 + &1, &1, 100)) |> assert()
+   Enum.all?(0..2, &test_single_candle(:week, 0.14 + &1, 0.68 + &1, 467 + &1, &1, 100)) |> assert()
   end
 
   def test_single_candle(timeframe, min_price, max_price, volume, timeframe_multiplier \\ 1, timeframe_divider \\ 1) do

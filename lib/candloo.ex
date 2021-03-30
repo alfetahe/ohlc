@@ -168,11 +168,6 @@ defmodule Candloo do
       )
 
     cond  do
-      # date_check === :eq ->
-      #    candle = create_candle(trade_formatted, timeframe)
-
-      # [[candle] ++ candles, trades_tail]
-
       date_check === :eq or date_check === :lt ->
         [candles, trades_tail]
 
@@ -187,9 +182,6 @@ defmodule Candloo do
         candles = [copied_candle] ++ candles
 
         copy_or_create_loop(candles, trades, timeframe)
-
-      # date_check === :lt ->
-      #   [candles, trades_tail]
     end
   end
 
@@ -382,6 +374,6 @@ defmodule Candloo do
         nil -> worked_time_struct
       end
 
-    %{unfinished_time_struct | day: worked_time_struct.day, hour: 0, minute: 0, second: 0}
+    %{unfinished_time_struct | month: worked_time_struct.month, day: worked_time_struct.day, hour: 0, minute: 0, second: 0}
   end
 end
