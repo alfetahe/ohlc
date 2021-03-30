@@ -93,7 +93,8 @@ defmodule CandlooTest do
     items = [
       [price: "15", volume: "0.2", time: "1616436287", side: "s"],
       [price: "17", volume: "0.6", time: "1616436299", side: "b"],
-      [price: "17", volume: "0.6", time: "1616436300", side: "b"]
+      [price: "17", volume: "0.6", time: "1616436300", side: "b"],
+      [price: "19", volume: "0.8", time: "1616436323", side: "b"]
     ]
 
     items ++ single_minute_candle_data()
