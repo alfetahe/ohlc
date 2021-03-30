@@ -10,38 +10,38 @@ defmodule CandlooAutomatedTest do
   # Minute Candles
 
   test "Test minute single candle" do
-    assert(test_single_candle(:minute, 172.2, 368, 94.3, 0))
+  #  assert(test_single_candle(:minute, 172.2, 368, 94.3, 0))
   end
 
   test "Test minute multiple candles" do
-    Enum.all?(0..1000, &test_single_candle(:minute, 83 + &1, 156 + &1, 2 + &1, &1)) |> assert()
+  #  Enum.all?(0..1000, &test_single_candle(:minute, 83 + &1, 156 + &1, 2 + &1, &1)) |> assert()
   end
 
   # Hourly candles
 
   test "Test hourly single candle" do
-    assert(test_single_candle(:hour, 1533.45, 4893.232, 1.6, 0))
+  #  assert(test_single_candle(:hour, 1533.45, 4893.232, 1.6, 0))
   end
 
   test "Test hourly multiple candles" do
-    Enum.all?(0..10, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1)) |> assert()
+  #  Enum.all?(0..10, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1)) |> assert()
   end
 
   # Daily candles
 
   test "Test daily single candle" do
-    assert(test_single_candle(:day, 88.2, 112, 4.2, 0))
+  #  assert(test_single_candle(:day, 88.2, 112, 4.2, 0))
   end
 
-  # test "Test daily multiple candles" do
-  #   Enum.all?(1..100, &test_single_candle(:day, 142.2 * &1, 2430 * &1, &1)) |> assert()
-  # end
+  test "Test daily multiple candles" do
+  #  Enum.all?(0..3, &test_single_candle(:day, 142.2 + &1, 369.23 + &1, 0.3 + &1, &1)) |> assert()
+  end
 
   # # Weekly candles
 
-  # test "Test weekly single candle" do
-  #   assert(test_single_candle(:week, 19232, 15, 1))
-  # end
+  test "Test weekly single candle" do
+    assert(test_single_candle(:week, 0.23, 0.42, 156.65, 0))
+  end
 
   # test "Test weekly multiple candle" do
   #   Enum.all?(1..10, &test_single_candle(:week, 123 * &1, 153 * &1, &1)) |> assert()
@@ -67,7 +67,7 @@ defmodule CandlooAutomatedTest do
     volume_to_check = ((@timeframes[timeframe] / 10 |> trunc()) * volume)
     volume_to_check = is_float(volume_to_check) && Float.round(volume_to_check, 4) || volume_to_check
 
-    statement = length(data[:candles]) === 1 and
+    length(data[:candles]) === 1 and
       Enum.at(data[:candles], 0).high === max_price and
       Enum.at(data[:candles], 0).low === min_price and
       Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and

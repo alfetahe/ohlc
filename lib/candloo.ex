@@ -118,8 +118,8 @@ defmodule Candloo do
        ) do
     formatted_trade_data = format_trade_data(trades_head)
 
-    candle_in_timeframe =
-      dates_match_timeframe?(candles_head.etime, formatted_trade_data[:time], timeframe)
+    dates_match =
+      dates_match_timeframe(candles_head.etime, formatted_trade_data[:time], timeframe)
 
     [candles, trades_tail] =
       cond do
@@ -129,12 +129,12 @@ defmodule Candloo do
           [[candle] ++ candles_body, trades_tail]
 
         # Updates last candle.
-        candle_in_timeframe ->
+        dates_match === :eq ->
           updated_candle = update_candle(candles_head, formatted_trade_data)
           [[updated_candle] ++ candles_body, trades_tail]
 
         # Creates new candle or candles.
-        !candle_in_timeframe ->
+        dates_match === :lt or dates_match === :gt or dates_match === :empty_first_date ->
           case no_trade_option do
             @no_trades_copy_last_close ->
               copy_or_create_loop([candles_head | candles_body], trades, timeframe)
@@ -161,34 +161,32 @@ defmodule Candloo do
     candles_head_etime_added = get_etime_rounded(candles_head.etime, timeframe, type: :add)
 
     date_check =
-      dates_match_timeframe?(
+      dates_match_timeframe(
         trade_formatted[:time],
         candles_head_etime_added,
-        timeframe,
-        :first_smaller_check
+        timeframe
       )
 
-    date_check =
-      case date_check do
-        {:error, msg} -> raise msg
-        _ -> date_check
-      end
-
-    if date_check do
-      candle = create_candle(trade_formatted, timeframe)
+    cond  do
+      date_check === :eq ->
+         candle = create_candle(trade_formatted, timeframe)
 
       [[candle] ++ candles, trades_tail]
-    else
-      copied_candle =
-        get_empty_candle(
-          candles_head.close,
-          candles_head_etime_added,
-          candles_head_etime_added
-        )
 
-      candles = [copied_candle] ++ candles
+      date_check === :gt ->
+        copied_candle =
+          get_empty_candle(
+            candles_head.close,
+            candles_head_etime_added,
+            candles_head_etime_added
+          )
 
-      copy_or_create_loop(candles, trades, timeframe)
+        candles = [copied_candle] ++ candles
+
+        copy_or_create_loop(candles, trades, timeframe)
+
+      date_check === :lt ->
+        [candles, trades_tail]
     end
   end
 
@@ -252,27 +250,14 @@ defmodule Candloo do
   defp format_to_float(value) when is_float(value), do: value
   defp format_to_float(value), do: {:error, "Data not formattable to float: #{value}"}
 
-  defp dates_match_timeframe?(first_date, second_date, timeframe, opts \\ []) do
+  defp dates_match_timeframe(first_date, second_date, timeframe) do
     if first_date !== 0 do
       first_date = get_etime_rounded(first_date, timeframe, format: :struct)
       second_date = get_etime_rounded(second_date, timeframe, format: :struct)
 
-      case DateTime.compare(first_date, second_date) do
-        :gt ->
-          false
-
-        :lt ->
-          if opts[:first_date_smaller_err] do
-            {:error, "First date cannot be less then second. Please check the input."}
-          else
-            false
-          end
-
-        :eq ->
-          true
-      end
+      DateTime.compare(first_date, second_date)
     else
-      false
+      :empty_first_date
     end
   end
 
@@ -360,7 +345,7 @@ defmodule Candloo do
 
   defp etime_day_worker(time_struct, unfinished_time_struct, opts) do
     worked_time_struct =
-      if time_struct.second === 0 and time_struct.minute === 0 do
+      if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 do
         time_struct
       else
         DateTime.add(time_struct, 86_400, :second)
