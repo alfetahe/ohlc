@@ -169,7 +169,8 @@ defmodule Candloo do
 
     cond  do
       date_check === :eq or date_check === :lt ->
-        [candles, trades_tail]
+        candle = create_candle(trade_formatted, timeframe)
+        [[candle] ++ candles, trades_tail]
 
       date_check === :gt ->
         copied_candle =
