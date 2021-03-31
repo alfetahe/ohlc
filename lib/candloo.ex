@@ -237,14 +237,14 @@ defmodule Candloo do
     trade
   end
 
-  defp format_to_float(value) when is_binary(value) do
+  def format_to_float(value) when is_binary(value) do
     {float, _} = value |> String.replace(",", ".") |> String.trim() |> Float.parse()
     float
   end
 
-  defp format_to_float(value) when is_number(value) or is_integer(value), do: value / 1
-  defp format_to_float(value) when is_float(value), do: value
-  defp format_to_float(value), do: {:error, "Data not formattable to float: #{value}"}
+  def format_to_float(value) when is_number(value) or is_integer(value), do: value / 1
+  def format_to_float(value) when is_float(value), do: value
+  def format_to_float(value), do: {:error, "Data not formattable to float: #{value}"}
 
   defp dates_match_timeframe(first_date, second_date, timeframe) do
     if first_date !== 0 do
