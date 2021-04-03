@@ -17,6 +17,23 @@ defmodule Candloo do
         timeframe,
         opts \\ []
       ) do
+
+    candles = [%Candle{}]
+
+    construct_candles(candles, trades, timeframe, opts)
+  end
+
+  def append_or_create_candles(
+    %Candloo.Candle{} = candle,
+    [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
+    timeframe,
+    opts \\ []
+  ) do
+
+    construct_candles([candle], trades, timeframe, opts)
+  end
+
+  defp construct_candles(candles, trades, timeframe, opts) do
     no_trade_option = set_trade_option(opts)
 
     case validate_data(trades, timeframe) do
@@ -27,32 +44,11 @@ defmodule Candloo do
         data = %{
           pair: opts[:pair],
           timeframe: timeframe,
-          candles: loop_trades(trades, [%Candle{}], timeframe, no_trade_option)
+          candles: loop_trades(trades, candles, timeframe, no_trade_option)
         }
 
         {:ok, data}
     end
-  end
-
-  def append_or_create_candles(
-    existing_candle,
-    [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
-    timeframe,
-    opts \\ []
-  ) do
-
-    as = 2
-
-
-    as = as +5
-
-    # If first trade time is smaller then existing candles etime means we need to append.
-
-
-    # Else we need to create new candle/candles.
-
-    # Return all candles
-
   end
 
   defp set_trade_option(opts) do

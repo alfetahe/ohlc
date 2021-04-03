@@ -2,6 +2,23 @@ defmodule CandlooStaticTest do
   use ExUnit.Case
   doctest Candloo
 
+  test "Must contain one single minute candles" do
+    trades_1 = single_min_data_1()
+    {:ok, data} = Candloo.create_candles(trades_1, :minute)
+
+    candle = Enum.at(data[:candles], 0)
+
+    trades_2 = single_min_data_2()
+    {:ok, data} = Candloo.append_or_create_candles(candle, trades_2, :minute)
+
+    assert(
+      length(data[:candles]) === 1 and
+        Enum.at(data[:candles], 0).open === Enum.at(trades_1, 0)[:price] |> Candloo.format_to_float() and
+        Enum.at(data[:candles], 0).close === Enum.at(trades_2, -1)[:price] |> Candloo.format_to_float() and
+        Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades_1 ++ trades_2)
+    )
+  end
+
   test "Must contain only single one minute candle" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
@@ -127,6 +144,30 @@ defmodule CandlooStaticTest do
       [price: "11", volume: "17", time: "1616436355", side: "b"],
       [price: "11", volume: "11", time: "1616436358", side: "s"],
       [price: "11.11", volume: "1125", time: "1616436359", side: "b"]
+    ]
+  end
+
+  def single_min_data_1 do
+    [
+      [price: 15, volume: "0.2", time: "1616436301", side: "s"],
+      [price: 17, volume: "0.6", time: "1616436302", side: "b"],
+      [price: 15, volume: "12", time: "1616436303", side: "s"],
+      [price: 15, volume: "150", time: "1616436303", side: "b"],
+      [price: 12, volume: "1.5", time: "1616436314", side: "s"],
+      [price: 1, volume: "1.6", time: "1616436316", side: "b"],
+      [price: 24, volume: "1.7", time: "1616436322", side: "s"],
+    ]
+  end
+
+  def single_min_data_2 do
+    [
+      [price: 167, volume: "19", time: "1616436346", side: "b"],
+      [price: 0.3, volume: "15", time: "1616436347", side: "s"],
+      [price: 165.7, volume: "13", time: "1616436347", side: "b"],
+      [price: 12, volume: "13", time: "1616436352", side: "s"],
+      [price: 11, volume: "17", time: "1616436355", side: "b"],
+      [price: 11, volume: "11", time: "1616436358", side: "s"],
+      [price: 11.11, volume: "1125", time: "1616436359", side: "b"]
     ]
   end
 
