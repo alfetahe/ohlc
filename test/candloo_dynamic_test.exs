@@ -1,4 +1,4 @@
-defmodule CandlooAutomatedTest do
+defmodule CandlooDynamicTest do
   use ExUnit.Case
   doctest Candloo
 

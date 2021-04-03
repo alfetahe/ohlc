@@ -1,4 +1,4 @@
-defmodule CandlooTest do
+defmodule CandlooStaticTest do
   use ExUnit.Case
   doctest Candloo
 
