@@ -17,13 +17,7 @@ defmodule Candloo do
         timeframe,
         opts \\ []
       ) do
-    no_trade_option =
-      if Enum.member?(opts, @no_trades_skip_candles) do
-        @no_trades_skip_candles
-      else
-        # By default were coping the last candles close price if no trades in interval.
-        @no_trades_copy_last_close
-      end
+    no_trade_option = set_trade_option(opts)
 
     case validate_data(trades, timeframe) do
       {:error, msg} ->
@@ -40,7 +34,37 @@ defmodule Candloo do
     end
   end
 
-  def validate_data(trades, timeframe) do
+  def append_or_create_candles(
+    existing_candle,
+    [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
+    timeframe,
+    opts \\ []
+  ) do
+
+    as = 2
+
+
+    as = as +5
+
+    # If first trade time is smaller then existing candles etime means we need to append.
+
+
+    # Else we need to create new candle/candles.
+
+    # Return all candles
+
+  end
+
+  defp set_trade_option(opts) do
+    if Enum.member?(opts, @no_trades_skip_candles) do
+      @no_trades_skip_candles
+    else
+      # By default were coping the last candles close price if no trades in interval.
+      @no_trades_copy_last_close
+    end
+  end
+
+  defp validate_data(trades, timeframe) do
     case validate_timeframe(timeframe) do
       {:error, timeframe_error_msg} ->
         {:error, timeframe_error_msg}

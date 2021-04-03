@@ -2,30 +2,6 @@ defmodule CandlooStaticTest do
   use ExUnit.Case
   doctest Candloo
 
-  test "Trades list is not sequenced by date and must return an error." do
-    case Candloo.create_candles(data_not_sequenced(), :minute) do
-      {:error, _} -> assert(true)
-      {:ok, _} -> assert(false)
-      _ -> assert(false)
-    end
-  end
-
-  test "Trades list does not contain all necessary keys and must return an error" do
-    case Candloo.create_candles(error_in_keys(), :minute) do
-      {:error, _} -> assert(true)
-      {:ok, _} -> assert(false)
-      _ -> assert(false)
-    end
-  end
-
-  test "Trades list value for :side is wrong and must return an error" do
-    case Candloo.create_candles(data_key_value_wrong(), :minute) do
-      {:error, _} -> assert(true)
-      {:ok, _} -> assert(false)
-      _ -> assert(false)
-    end
-  end
-
   test "Must contain only single one minute candle" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
@@ -85,7 +61,7 @@ defmodule CandlooStaticTest do
   test "Single weekly candle" do
     trades = single_weekly_candle_1()
 
-    {:ok, data} = Candloo.create_candles(trades, :week)
+    {:ok, data} = Candloo.create_candles(trades, :week, [:skip_no_trades])
 
     assert(
       length(data[:candles]) === 1 and
@@ -93,6 +69,32 @@ defmodule CandlooStaticTest do
         Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
         Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades)
     )
+  end
+
+  # Error tests
+
+  test "Trades list is not sequenced by date and must return an error." do
+    case Candloo.create_candles(data_not_sequenced(), :minute) do
+      {:error, _} -> assert(true)
+      {:ok, _} -> assert(false)
+      _ -> assert(false)
+    end
+  end
+
+  test "Trades list does not contain all necessary keys and must return an error" do
+    case Candloo.create_candles(error_in_keys(), :minute) do
+      {:error, _} -> assert(true)
+      {:ok, _} -> assert(false)
+      _ -> assert(false)
+    end
+  end
+
+  test "Trades list value for :side is wrong and must return an error" do
+    case Candloo.create_candles(data_key_value_wrong(), :minute) do
+      {:error, _} -> assert(true)
+      {:ok, _} -> assert(false)
+      _ -> assert(false)
+    end
   end
 
   defp calculate_total_volume_trades(trades) do
