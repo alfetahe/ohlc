@@ -69,10 +69,23 @@ defmodule CandlooStaticTest do
     assert Enum.at(data[:candles], 0).close === 11.11
   end
 
-  test "Single daily candles test" do
+  test "Single daily candles" do
     trades = single_daily_candle_1()
 
     {:ok, data} = Candloo.create_candles(trades, :day)
+
+    assert(
+      length(data[:candles]) === 1 and
+        Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
+        Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
+        Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades)
+    )
+  end
+
+  test "Single weekly candle" do
+    trades = single_weekly_candle_1()
+
+    {:ok, data} = Candloo.create_candles(trades, :week)
 
     assert(
       length(data[:candles]) === 1 and
@@ -160,6 +173,16 @@ defmodule CandlooStaticTest do
       [price: 125.12, volume: "1.9", time: "1616674974", side: "s"],
       [price: 126.877, volume: "15", time: "1616702514", side: "s"],
       [price: 19.3, volume: "19.43", time: "1616709599", side: "b"]
+    ]
+  end
+
+  defp single_weekly_candle_1 do
+    [
+      [price: 125.54, volume: "0.1", time: "1617010382", side: "s"],
+      [price: 125.32, volume: "1.4", time: "1617096782", side: "b"],
+      [price: 125.12, volume: "1.9", time: "1617183182", side: "s"],
+      [price: 126.877, volume: "15", time: "1617269582", side: "s"],
+      [price: 19.3, volume: "19.43", time: "1617355982", side: "b"]
     ]
   end
 
