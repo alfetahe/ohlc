@@ -76,21 +76,23 @@ defmodule CandlooStaticTest do
 
     assert(
       length(data[:candles]) === 1 and
-     Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
-     Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
-     Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades)
-     )
+        Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
+        Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
+        Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades)
+    )
   end
 
   def calculate_total_volume_trades(trades) do
     Enum.reduce(trades, fn trade, acc ->
       volume_formatted = Candloo.format_to_float(trade[:volume])
-      if (is_float(acc)) do
+
+      if is_float(acc) do
         acc + volume_formatted
       else
         Candloo.format_to_float(acc[:volume]) + volume_formatted
       end
-    end) |> Float.round(4)
+    end)
+    |> Float.round(4)
   end
 
   # Success return data items.
@@ -157,7 +159,7 @@ defmodule CandlooStaticTest do
       [price: 125.32, volume: "1.4", time: "1616641905", side: "b"],
       [price: 125.12, volume: "1.9", time: "1616674974", side: "s"],
       [price: 126.877, volume: "15", time: "1616702514", side: "s"],
-      [price: 19.3, volume: "19.43", time: "1616709599", side: "b"],
+      [price: 19.3, volume: "19.43", time: "1616709599", side: "b"]
     ]
   end
 

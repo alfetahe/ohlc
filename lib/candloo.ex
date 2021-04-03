@@ -167,7 +167,7 @@ defmodule Candloo do
         timeframe
       )
 
-    cond  do
+    cond do
       date_check === :eq or date_check === :lt ->
         candle = create_candle(trade_formatted, timeframe)
         [[candle] ++ candles, trades_tail]
@@ -222,7 +222,7 @@ defmodule Candloo do
       | close: trade[:price],
         high: max(trade[:price], candle.high) |> Float.round(4),
         low: min(trade[:price], candle.low) |> Float.round(4),
-        volume: trade[:volume] + candle.volume |> Float.round(4),
+        volume: (trade[:volume] + candle.volume) |> Float.round(4),
         trades: 1 + candle.trades,
         processed: true
     }
@@ -362,7 +362,8 @@ defmodule Candloo do
     days_to_calc = 7 - day_of_week + 1
 
     worked_time_struct =
-      if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 and days_to_calc === 7 do
+      if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 and
+           days_to_calc === 7 do
         time_struct
       else
         DateTime.add(time_struct, 86_400 * days_to_calc, :second)
@@ -375,6 +376,13 @@ defmodule Candloo do
         nil -> worked_time_struct
       end
 
-    %{unfinished_time_struct | month: worked_time_struct.month, day: worked_time_struct.day, hour: 0, minute: 0, second: 0}
+    %{
+      unfinished_time_struct
+      | month: worked_time_struct.month,
+        day: worked_time_struct.day,
+        hour: 0,
+        minute: 0,
+        second: 0
+    }
   end
 end
