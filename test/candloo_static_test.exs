@@ -82,7 +82,7 @@ defmodule CandlooStaticTest do
     )
   end
 
-  def calculate_total_volume_trades(trades) do
+  defp calculate_total_volume_trades(trades) do
     Enum.reduce(trades, fn trade, acc ->
       volume_formatted = Candloo.format_to_float(trade[:volume])
 
@@ -96,7 +96,7 @@ defmodule CandlooStaticTest do
   end
 
   # Success return data items.
-  def single_minute_candle_data do
+  defp single_minute_candle_data do
     [
       [price: "15", volume: "0.2", time: "1616436301", side: "s"],
       [price: "17", volume: "0.6", time: "1616436302", side: "b"],
@@ -115,7 +115,7 @@ defmodule CandlooStaticTest do
     ]
   end
 
-  def two_one_minute_candles() do
+  defp two_one_minute_candles() do
     items = [
       [price: "15", volume: "0.2", time: "1616436287", side: "s"],
       [price: "17", volume: "0.6", time: "1616436299", side: "b"],
@@ -125,7 +125,7 @@ defmodule CandlooStaticTest do
     items ++ single_minute_candle_data()
   end
 
-  def single_hourly_candle_1 do
+  defp single_hourly_candle_1 do
     [
       [price: "125.54", volume: "0.1", time: "1616436299", side: "s"],
       [price: "125.32", volume: "1.4", time: "1616436734", side: "b"],
@@ -139,7 +139,7 @@ defmodule CandlooStaticTest do
     ]
   end
 
-  def single_hourly_candle_2 do
+  defp single_hourly_candle_2 do
     [
       [price: "12", volume: "22", time: "1616439602", side: "b"],
       [price: "12.56", volume: "18.3", time: "1616440572", side: "b"],
@@ -153,7 +153,7 @@ defmodule CandlooStaticTest do
     ]
   end
 
-  def single_daily_candle_1 do
+  defp single_daily_candle_1 do
     [
       [price: 125.54, volume: "0.1", time: "1616633999", side: "s"],
       [price: 125.32, volume: "1.4", time: "1616641905", side: "b"],
@@ -164,14 +164,14 @@ defmodule CandlooStaticTest do
   end
 
   # Error return data items.
-  def data_key_value_wrong() do
+  defp data_key_value_wrong() do
     [
       [price: "15", volume: "15", time: "1615896167", side: "b"],
       [price: "15", volume: "15", time: "1615896167", side: 3]
     ]
   end
 
-  def data_not_sequenced() do
+  defp data_not_sequenced() do
     [
       [price: "15", volume: "15", time: "1615896667", side: "s"],
       [price: "15", volume: "15", time: "1616046310", side: "b"],
@@ -179,7 +179,7 @@ defmodule CandlooStaticTest do
     ]
   end
 
-  def error_in_keys() do
+  defp error_in_keys() do
     [
       [price: "15", volume: "15", time: "1615896167", side: "b"],
       [pricez: "15", volume: "15", time: "1615896168", side: "b"],
