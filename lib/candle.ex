@@ -1,4 +1,5 @@
 defmodule Candloo.Candle do
+  @derive Jason.Encoder
   defstruct stime: 0,
             etime: 0,
             open: 0,
