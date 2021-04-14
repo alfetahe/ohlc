@@ -31,15 +31,15 @@ defmodule Candloo do
 
   defp generate_empty_candle() do
     %{
-      etime: 0,
-      stime: 0,
-      open: 0,
-      high: 0,
-      low: nil,
-      close: 0,
-      volume: 0,
-      trades: 0,
-      processed: false
+      "etime" => 0,
+      "stime" => 0,
+      "open" => 0,
+      "high" => 0,
+      "low" => nil,
+      "close" => 0,
+      "volume" => 0,
+      "trades" => 0,
+      "processed" => false
     }
   end
 
@@ -149,12 +149,12 @@ defmodule Candloo do
     formatted_trade_data = format_trade_data(trades_head)
 
     dates_match =
-      dates_match_timeframe(candles_head.etime, formatted_trade_data[:time], timeframe)
+      dates_match_timeframe(candles_head["etime"], formatted_trade_data[:time], timeframe)
 
     [candles, trades_tail] =
       cond do
         # Appends new candle to the candles list without the unprocessed candle.
-        !candles_head.processed ->
+        !candles_head["processed"] ->
           candle = create_candle(formatted_trade_data, timeframe)
           [[candle] ++ candles_body, trades_tail]
 
@@ -188,7 +188,7 @@ defmodule Candloo do
          timeframe
        ) do
     trade_formatted = format_trade_data(trades_head)
-    candles_head_etime_added = get_etime_rounded(candles_head.etime, timeframe, type: :add)
+    candles_head_etime_added = get_etime_rounded(candles_head["etime"], timeframe, type: :add)
 
     date_check =
       dates_match_timeframe(
@@ -218,30 +218,30 @@ defmodule Candloo do
 
   defp get_empty_candle(last_price, stime, etime) do
     %{
-      open: last_price,
-      high: last_price,
-      low: last_price,
-      close: last_price,
-      volume: 0,
-      trades: 0,
-      stime: stime,
-      etime: etime,
-      processed: true
+      "open" => last_price,
+      "high" => last_price,
+      "low" => last_price,
+      "close" => last_price,
+      "volume" => 0,
+      "trades" => 0,
+      "stime" => stime,
+      "etime" => etime,
+      "processed" => true
     }
   end
 
   # Creates new candle.
   defp create_candle(trade, timeframe) do
     %{
-      open: trade[:price],
-      high: trade[:price],
-      low: trade[:price],
-      close: trade[:price],
-      volume: trade[:volume],
-      trades: 1,
-      stime: trade[:time],
-      etime: get_etime_rounded(trade[:time], timeframe),
-      processed: true
+      "open" => trade[:price],
+      "high" => trade[:price],
+      "low" => trade[:price],
+      "close" => trade[:price],
+      "volume" => trade[:volume],
+      "trades" => 1,
+      "stime" => trade[:time],
+      "etime" => get_etime_rounded(trade[:time], timeframe),
+      "processed" => true
     }
   end
 
@@ -249,12 +249,12 @@ defmodule Candloo do
   defp update_candle(candle, trade) do
     %{
       candle
-      | close: trade[:price],
-        high: max(trade[:price], candle.high) |> Float.round(4),
-        low: min(trade[:price], candle.low) |> Float.round(4),
-        volume: (trade[:volume] + candle.volume) |> Float.round(4),
-        trades: 1 + candle.trades,
-        processed: true
+      | "close" => trade[:price],
+        "high" => max(trade[:price], candle["high"]) |> Float.round(4),
+        "low" => min(trade[:price], candle["low"]) |> Float.round(4),
+        "volume" => (trade[:volume] + candle["volume"]) |> Float.round(4),
+        "trades" => 1 + candle["trades"],
+        "processed" => true
     }
   end
 
