@@ -21,8 +21,7 @@ defmodule Candloo.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:decimal, "~> 2.0"},
-      {:jason, "~> 1.2"}
+      {:decimal, "~> 2.0"}
     ]
   end
 end

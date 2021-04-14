@@ -3,8 +3,6 @@ defmodule Candloo do
   Documentation for Candloo.
   """
 
-  alias Candloo.Candle
-
   @no_trades_skip_candles :skip_no_trades
   @no_trades_copy_last_close :copy_last_close
   @timeframes [{:minute, 60}, {:hour, 3600}, {:day, 86_400}, {:week, 604_800}]
@@ -17,20 +15,32 @@ defmodule Candloo do
         timeframe,
         opts \\ []
       ) do
-
-    candles = [%Candle{}]
+    candles = [generate_empty_candle()]
 
     construct_candles(candles, trades, timeframe, opts)
   end
 
   def append_or_create_candles(
-    %Candloo.Candle{} = candle,
-    [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
-    timeframe,
-    opts \\ []
-  ) do
-
+        %{} = candle,
+        [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
+        timeframe,
+        opts \\ []
+      ) do
     construct_candles([candle], trades, timeframe, opts)
+  end
+
+  defp generate_empty_candle() do
+    %{
+      etime: 0,
+      stime: 0,
+      open: 0,
+      high: 0,
+      low: nil,
+      close: 0,
+      volume: 0,
+      trades: 0,
+      processed: false
+    }
   end
 
   defp construct_candles(candles, trades, timeframe, opts) do
@@ -207,7 +217,7 @@ defmodule Candloo do
   end
 
   defp get_empty_candle(last_price, stime, etime) do
-    %Candle{
+    %{
       open: last_price,
       high: last_price,
       low: last_price,
@@ -222,7 +232,7 @@ defmodule Candloo do
 
   # Creates new candle.
   defp create_candle(trade, timeframe) do
-    %Candle{
+    %{
       open: trade[:price],
       high: trade[:price],
       low: trade[:price],
