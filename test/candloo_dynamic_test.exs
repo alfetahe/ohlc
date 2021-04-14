@@ -97,15 +97,15 @@ defmodule CandlooDynamicTest do
     volume_to_check =
       (is_float(volume_to_check) && Float.round(volume_to_check, 4)) || volume_to_check
 
-    length(data[:candles]) === 1 and
-      Enum.at(data[:candles], 0).high === max_price and
-      Enum.at(data[:candles], 0).low === min_price and
-      Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
-      Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
-      Enum.at(data[:candles], 0).trades === length(trades) and
-      Enum.at(data[:candles], 0).volume === volume_to_check and
-      Enum.at(data[:candles], 0).stime === Enum.at(trades, 0)[:time] and
-      Enum.at(data[:candles], 0).etime ===
+    length(data["candles"]) === 1 and
+      Enum.at(data["candles"], 0).high === max_price and
+      Enum.at(data["candles"], 0).low === min_price and
+      Enum.at(data["candles"], 0).open === Enum.at(trades, 0)[:price] and
+      Enum.at(data["candles"], 0).close === Enum.at(trades, -1)[:price] and
+      Enum.at(data["candles"], 0).trades === length(trades) and
+      Enum.at(data["candles"], 0).volume === volume_to_check and
+      Enum.at(data["candles"], 0).stime === Enum.at(trades, 0)[:time] and
+      Enum.at(data["candles"], 0).etime ===
         Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
   end
 

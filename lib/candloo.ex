@@ -52,9 +52,9 @@ defmodule Candloo do
 
       {:ok, _} ->
         data = %{
-          pair: opts[:pair],
-          timeframe: timeframe,
-          candles: loop_trades(trades, candles, timeframe, no_trade_option)
+          "pair" => opts[:pair],
+          "timeframe" => timeframe,
+          "candles" => loop_trades(trades, candles, timeframe, no_trade_option)
         }
 
         {:ok, data}

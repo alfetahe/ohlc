@@ -6,62 +6,62 @@ defmodule CandlooStaticTest do
     trades_1 = single_min_data_1()
     {:ok, data} = Candloo.create_candles(trades_1, :minute)
 
-    candle = Enum.at(data[:candles], 0)
+    candle = Enum.at(data["candles"], 0)
 
     trades_2 = single_min_data_2()
     {:ok, data} = Candloo.append_or_create_candles(candle, trades_2, :minute)
 
     assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0).open ===
+      length(data["candles"]) === 1 and
+        Enum.at(data["candles"], 0).open ===
           Enum.at(trades_1, 0)[:price] |> Candloo.format_to_float() and
-        Enum.at(data[:candles], 0).close ===
+        Enum.at(data["candles"], 0).close ===
           Enum.at(trades_2, -1)[:price] |> Candloo.format_to_float() and
-        Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades_1 ++ trades_2)
+        Enum.at(data["candles"], 0).volume === calculate_total_volume_trades(trades_1 ++ trades_2)
     )
   end
 
   test "Must contain only single one minute candle" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert length(data[:candles]) === 1
+    assert length(data["candles"]) === 1
   end
 
   test "Must contain two one minute candles" do
     {:ok, data} = Candloo.create_candles(two_one_minute_candles(), :minute)
 
-    assert length(data[:candles]) === 2
+    assert length(data["candles"]) === 2
   end
 
   test "Must contain two hourly candles" do
     trades = single_hourly_candle_1() ++ single_hourly_candle_2()
     {:ok, data} = Candloo.create_candles(trades, :hour, [:skip_no_trades])
 
-    assert length(data[:candles]) === 2
+    assert length(data["candles"]) === 2
   end
 
   test "First candles high = 167.5000" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).high === 167.5
+    assert Enum.at(data["candles"], 0).high === 167.5
   end
 
   test "First candles low = 0.3000" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).low === 0.3
+    assert Enum.at(data["candles"], 0).low === 0.3
   end
 
   test "First candles open = 15.5000" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).open === 15.0
+    assert Enum.at(data["candles"], 0).open === 15.0
   end
 
   test "First candles close = 11.1100" do
     {:ok, data} = Candloo.create_candles(single_minute_candle_data(), :minute)
 
-    assert Enum.at(data[:candles], 0).close === 11.11
+    assert Enum.at(data["candles"], 0).close === 11.11
   end
 
   test "Single daily candles" do
@@ -70,10 +70,10 @@ defmodule CandlooStaticTest do
     {:ok, data} = Candloo.create_candles(trades, :day)
 
     assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
-        Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
-        Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades)
+      length(data["candles"]) === 1 and
+        Enum.at(data["candles"], 0).open === Enum.at(trades, 0)[:price] and
+        Enum.at(data["candles"], 0).close === Enum.at(trades, -1)[:price] and
+        Enum.at(data["candles"], 0).volume === calculate_total_volume_trades(trades)
     )
   end
 
@@ -83,10 +83,10 @@ defmodule CandlooStaticTest do
     {:ok, data} = Candloo.create_candles(trades, :week, [:skip_no_trades])
 
     assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0).open === Enum.at(trades, 0)[:price] and
-        Enum.at(data[:candles], 0).close === Enum.at(trades, -1)[:price] and
-        Enum.at(data[:candles], 0).volume === calculate_total_volume_trades(trades)
+      length(data["candles"]) === 1 and
+        Enum.at(data["candles"], 0).open === Enum.at(trades, 0)[:price] and
+        Enum.at(data["candles"], 0).close === Enum.at(trades, -1)[:price] and
+        Enum.at(data["candles"], 0).volume === calculate_total_volume_trades(trades)
     )
   end
 
