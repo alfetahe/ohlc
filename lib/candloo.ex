@@ -10,8 +10,10 @@ defmodule Candloo do
   @doc """
   Creates OHLC candles from trades.
   """
+  @spec create_candles(list(), atom(), list()) ::
+          {:error, <<_::64, _::_*8>>} | {:ok, %{optional(<<_::32, _::_*8>>) => any}}
   def create_candles(
-        [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
+        trades,
         timeframe,
         opts \\ []
       ) do
@@ -20,9 +22,11 @@ defmodule Candloo do
     construct_candles(candles, trades, timeframe, opts)
   end
 
+  @spec append_or_create_candles(map(), list(), atom(), list()) ::
+          {:error, <<_::64, _::_*8>>} | {:ok, %{optional(<<_::32, _::_*8>>) => any}}
   def append_or_create_candles(
         %{} = candle,
-        [[{:price, _}, {:volume, _}, {:time, _}, {:side, _}] | _] = trades,
+        trades,
         timeframe,
         opts \\ []
       ) do
