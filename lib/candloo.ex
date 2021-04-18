@@ -224,7 +224,7 @@ defmodule Candloo do
       date_check === :gt ->
         copied_candle =
           get_empty_candle(
-            candles_head.close,
+            candles_head["close"],
             candles_head_etime_added,
             candles_head_etime_added
           )
