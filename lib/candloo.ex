@@ -123,8 +123,8 @@ defmodule Candloo do
 
   defp validate_trade_data(trade, prev_etime) do
     price_validation = is_float(format_to_float(trade[:price]))
-    time_validation = is_float(format_to_float(trade[:time]))
     volume_validation = is_float(format_to_float(trade[:volume]))
+    time_validation = is_float(format_to_float(trade[:time]))
     side_validation = trade[:side] === "s" or trade[:side] === "b" || false
 
     etime_greater =
@@ -134,12 +134,27 @@ defmodule Candloo do
         true -> false
       end
 
-    if price_validation and time_validation and volume_validation and side_validation and
-         etime_greater do
-      {:ok, "Trade data validated."}
-    else
-      {:error,
-       "Error validating trades data. Data types wrong or not sequenced: #{inspect(trade)}"}
+    cond do
+      !price_validation ->
+        {:error, "Price is not float: #{format_to_float(trade[:price])}"}
+
+      !volume_validation ->
+        {:error, "Volume is not float: #{format_to_float(trade[:volume])}"}
+
+      !time_validation ->
+        {:error, "Time is not float: #{format_to_float(trade[:volume])}"}
+
+      !side_validation ->
+        {:error, "Side is incorrect: #{format_to_float(trade[:side])}"}
+
+      !etime_greater ->
+        {:error,
+         "Current trade time(#{format_to_float(trade[:time])}) is not bigger or equal to the previous trade time(#{
+           format_to_float(prev_etime)
+         })"}
+
+      true ->
+        {:ok, "Trade data validated."}
     end
   end
 

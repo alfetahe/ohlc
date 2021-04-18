@@ -17,7 +17,8 @@ defmodule CandlooStaticTest do
           Enum.at(trades_1, 0)[:price] |> Candloo.format_to_float() and
         Enum.at(data["candles"], 0)["close"] ===
           Enum.at(trades_2, -1)[:price] |> Candloo.format_to_float() and
-        Enum.at(data["candles"], 0)["volume"] === calculate_total_volume_trades(trades_1 ++ trades_2)
+        Enum.at(data["candles"], 0)["volume"] ===
+          calculate_total_volume_trades(trades_1 ++ trades_2)
     )
   end
 
