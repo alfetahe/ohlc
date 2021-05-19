@@ -25,7 +25,7 @@ defmodule Candloo do
   @spec append_or_create_candles(map(), list(), atom(), list()) ::
           {:error, <<_::64, _::_*8>>} | {:ok, %{optional(<<_::32, _::_*8>>) => any}}
   def append_or_create_candles(
-        %{} = candle,
+        candle,
         trades,
         timeframe,
         opts \\ []
