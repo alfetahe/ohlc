@@ -30,6 +30,12 @@ defmodule Candloo do
         timeframe,
         opts \\ []
       ) do
+
+    candle = cond do
+      candle == %{} -> generate_empty_candle()
+      true -> candle
+    end
+
     construct_candles([candle], trades, timeframe, opts)
   end
 
@@ -81,8 +87,11 @@ defmodule Candloo do
 
       {:ok, _} ->
         candles_validated = validate_candles(candles)
+
         case candles_validated do
-          {:error, candles_error_msg} -> {:error, candles_error_msg}
+          {:error, candles_error_msg} ->
+            {:error, candles_error_msg}
+
           {:ok, _} ->
             trades_validated = validate_trades(trades)
 
@@ -97,7 +106,7 @@ defmodule Candloo do
   defp validate_candles(candles) do
     data_validated = Enum.all?(candles, fn candle -> is_map(candle) end)
 
-    if (data_validated) do
+    if data_validated do
       {:ok, "Candles validated."}
     else
       {:error, "Candles must be type of map."}
