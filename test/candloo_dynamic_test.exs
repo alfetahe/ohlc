@@ -104,7 +104,8 @@ defmodule CandlooDynamicTest do
       Enum.at(data["candles"], 0)["close"] === Enum.at(trades, -1)[:price] and
       Enum.at(data["candles"], 0)["trades"] === length(trades) and
       Enum.at(data["candles"], 0)["volume"] === volume_to_check and
-      Enum.at(data["candles"], 0)["stime"] === Enum.at(trades, 0)[:time] and
+      Enum.at(data["candles"], 0)["stime"] ===
+        Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, type: :substract) and
       Enum.at(data["candles"], 0)["etime"] ===
         Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
   end

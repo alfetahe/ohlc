@@ -282,7 +282,7 @@ defmodule Candloo do
       "close" => trade[:price],
       "volume" => trade[:volume],
       "trades" => 1,
-      "stime" => trade[:time],
+      "stime" => get_etime_rounded(trade[:time], timeframe, [type: :substract]),
       "etime" => get_etime_rounded(trade[:time], timeframe),
       "processed" => true
     }
