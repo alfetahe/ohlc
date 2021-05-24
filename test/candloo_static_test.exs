@@ -2,6 +2,26 @@ defmodule CandlooStaticTest do
   use ExUnit.Case
   doctest Candloo
 
+  test "Candle appendind 1" do
+    trades_1 = single_min_data_1()
+    {:ok, data} = Candloo.create_candles(trades_1, :minute)
+
+    candle = Enum.at(data["candles"], 0)
+
+    trades_2 = single_min_data_1()
+    {:ok, data} = Candloo.append_or_create_candles(candle, trades_2, :minute)
+
+    assert(
+      length(data["candles"]) === 1 and
+        Enum.at(data["candles"], 0)["open"] ===
+          Enum.at(trades_1, 0)[:price] |> Candloo.format_to_float() and
+        Enum.at(data["candles"], 0)["close"] ===
+          Enum.at(trades_2, -1)[:price] |> Candloo.format_to_float() and
+        Enum.at(data["candles"], 0)["volume"] ===
+          calculate_total_volume_trades(trades_1 ++ trades_2)
+    )
+  end
+
   test "Must contain one single minute candles" do
     trades_1 = single_min_data_1()
     {:ok, data} = Candloo.create_candles(trades_1, :minute)
