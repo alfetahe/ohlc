@@ -30,16 +30,16 @@ defmodule Candloo do
         timeframe,
         opts \\ []
       ) do
-
-    candle = cond do
-      candle == %{} -> generate_empty_candle()
-      true -> candle
-    end
+    candle =
+      cond do
+        candle == %{} -> generate_empty_candle()
+        true -> candle
+      end
 
     construct_candles([candle], trades, timeframe, opts)
   end
 
-  defp generate_empty_candle() do
+  def generate_empty_candle() do
     %{
       "etime" => 0,
       "stime" => 0,
@@ -173,9 +173,7 @@ defmodule Candloo do
 
       !etime_greater ->
         {:error,
-         "Current trade time(#{format_to_float(trade[:time])}) is not bigger or equal to the previous trade time(#{
-           format_to_float(prev_etime)
-         })"}
+         "Current trade time(#{format_to_float(trade[:time])}) is not bigger or equal to the previous trade time(#{format_to_float(prev_etime)})"}
 
       true ->
         {:ok, "Trade data validated."}
@@ -282,7 +280,7 @@ defmodule Candloo do
       "close" => trade[:price],
       "volume" => trade[:volume],
       "trades" => 1,
-      "stime" => get_etime_rounded(trade[:time], timeframe, [type: :substract]),
+      "stime" => get_etime_rounded(trade[:time], timeframe, type: :substract),
       "etime" => get_etime_rounded(trade[:time], timeframe),
       "processed" => true
     }
