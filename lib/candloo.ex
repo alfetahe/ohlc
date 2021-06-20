@@ -45,7 +45,7 @@ defmodule Candloo do
       "stime" => 0,
       "open" => 0,
       "high" => 0,
-      "low" => nil,
+      "low" => 0,
       "close" => 0,
       "volume" => 0,
       "trades" => 0,
