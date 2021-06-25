@@ -1,6 +1,8 @@
 defmodule OHLC do
   @moduledoc """
   Library for generating OHLC candles from trades.
+
+
   """
 
   import OHLCHelper
@@ -27,9 +29,8 @@ defmodule OHLC do
   Useful when you don't want to get empty time gap between the generated candles.
   - `:validate_trades` - When set true all trades are being validated before
   generating the candles to avoid errors and misinformation.
-  - `:previous_candle` - If provided the previous candle trades are appended
-  to the previous candle if possible before generating the new candles.
-
+  - `:previous_candle` - Trades are appended to the previous candle if possible
+  before generating the new candles.
   """
   @type opts :: [
           {:forward_fill, boolean()}
@@ -210,7 +211,7 @@ defmodule OHLC do
          timeframe
        ) do
     trade_formatted = format_trade_data(trades_head)
-    candles_head_etime_added = get_time_rounded(candles_head["etime"], timeframe, type: :end)
+    candles_head_etime_added = get_time_rounded(candles_head["etime"], timeframe, type: :jump)
 
     date_check =
       dates_match_timeframe(
@@ -261,7 +262,7 @@ defmodule OHLC do
       "close" => trade[:price],
       "volume" => trade[:volume],
       "trades" => 1,
-      "stime" => get_time_rounded(trade[:time], timeframe, type: :start),
+      "stime" => get_time_rounded(trade[:time], timeframe, type: :down),
       "etime" => get_time_rounded(trade[:time], timeframe),
       "processed" => true
     }

@@ -109,7 +109,7 @@ defmodule OHLCDynamicTest do
       Enum.at(data["candles"], 0)["trades"] === length(trades) and
       Enum.at(data["candles"], 0)["volume"] === volume_to_check and
       Enum.at(data["candles"], 0)["stime"] ===
-        get_time_rounded(Enum.at(trades, -1)[:time], timeframe, type: :start) and
+        get_time_rounded(Enum.at(trades, -1)[:time], timeframe, type: :down) and
       Enum.at(data["candles"], 0)["etime"] ===
         get_time_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
   end

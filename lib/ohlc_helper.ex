@@ -1,10 +1,24 @@
 defmodule OHLCHelper do
   @moduledoc """
-    OHLC Helper module containing all helper functions.
+  OHLC Helper module containing all the helper functions.
   """
 
   @doc """
-  Generates empty candle.
+  Generates and returns empty candle.
+
+  `
+    %{
+      "etime" => 0,
+      "stime" => 0,
+      "open" => 0,
+      "high" => 0,
+      "low" => 0,
+      "close" => 0,
+      "volume" => 0,
+      "trades" => 0,
+      "processed" => false
+    }
+  `
   """
   @spec generate_empty_candle :: map()
   def generate_empty_candle() do
@@ -36,6 +50,16 @@ defmodule OHLCHelper do
 
   @doc """
   Gets the rounded timestamp based on the timeframe.
+  Parameters:
+  - `timestamp` - Unix timestamp which will be rounded.
+  - `timeframe` - Timeframe used for rounding the timestamp.
+  Available values are: `:minute`, `:hour`, `:day`, `:week`
+  - `opts` - Options for rounding the timestamp.
+  Available values are:
+    - `{:format, :stamp | :struct}` - Returned value will be
+    unix timestamp or DateTime struct.
+    - `{:type, :down | :up | :jump}` - Timestamp will be rounded
+    up, down or jump to the next time cycle. Default is `:up`.
   """
   def get_time_rounded(timestamp, timeframe, opts \\ []) do
     timestamp = timestamp |> format_to_float() |> round()
@@ -66,7 +90,7 @@ defmodule OHLCHelper do
     case opts[:format] do
       :stamp -> DateTime.to_unix(rounded_time)
       :struct -> rounded_time
-      nil -> DateTime.to_unix(rounded_time)
+      _ -> DateTime.to_unix(rounded_time)
     end
   end
 
@@ -78,12 +102,7 @@ defmodule OHLCHelper do
         DateTime.add(time_struct, 60, :second)
       end
 
-    worked_time_struct =
-      case opts[:type] do
-        :start -> DateTime.add(worked_time_struct, -60, :second)
-        :end -> DateTime.add(worked_time_struct, 60, :second)
-        nil -> worked_time_struct
-      end
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], 60)
 
     %{
       unfinished_time_struct
@@ -102,19 +121,14 @@ defmodule OHLCHelper do
         DateTime.add(time_struct, 3600, :second)
       end
 
-    worked_time_struct =
-      case opts[:type] do
-        :end -> DateTime.add(worked_time_struct, 3600, :second)
-        :start -> DateTime.add(worked_time_struct, -3600, :second)
-        nil -> worked_time_struct
-      end
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], 3600)
 
     %{
       unfinished_time_struct
       | day: worked_time_struct.day,
         hour: worked_time_struct.hour,
-        minute: 00,
-        second: 00
+        minute: 0,
+        second: 0
     }
   end
 
@@ -126,12 +140,7 @@ defmodule OHLCHelper do
         DateTime.add(time_struct, 86_400, :second)
       end
 
-    worked_time_struct =
-      case opts[:type] do
-        :end -> DateTime.add(worked_time_struct, 86_400, :second)
-        :start -> DateTime.add(worked_time_struct, -86_400, :second)
-        nil -> worked_time_struct
-      end
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], 86_400)
 
     %{unfinished_time_struct | day: worked_time_struct.day, hour: 0, minute: 0, second: 0}
   end
@@ -148,12 +157,7 @@ defmodule OHLCHelper do
         DateTime.add(time_struct, 86_400 * days_to_calc, :second)
       end
 
-    worked_time_struct =
-      case opts[:type] do
-        :end -> DateTime.add(worked_time_struct, 604_800, :second)
-        :start -> DateTime.add(worked_time_struct, -604_800, :second)
-        nil -> worked_time_struct
-      end
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], 604_800)
 
     %{
       unfinished_time_struct
@@ -163,5 +167,14 @@ defmodule OHLCHelper do
         minute: 0,
         second: 0
     }
+  end
+
+  defp time_worker(timestruct, type, timeframe_secs) do
+    case type do
+      :down -> DateTime.add(timestruct, -timeframe_secs, :second)
+      :jump -> DateTime.add(timestruct, timeframe_secs, :second)
+      :up -> timestruct
+      nil -> timestruct
+    end
   end
 end
