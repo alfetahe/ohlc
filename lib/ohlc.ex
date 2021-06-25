@@ -85,6 +85,7 @@ defmodule OHLC do
        ) do
     formatted_trade_data = format_trade_data(trades_head)
 
+
     dates_match =
       dates_match_timeframe(candles_head["etime"], formatted_trade_data[:time], timeframe)
 
@@ -141,7 +142,7 @@ defmodule OHLC do
 
       date_check === :gt ->
         copied_candle =
-          get_empty_candle(
+          forward_candle(
             candles_head["close"],
             candles_head_etime_added,
             candles_head_etime_added
@@ -153,18 +154,13 @@ defmodule OHLC do
     end
   end
 
-  defp get_empty_candle(last_price, stime, etime) do
-    %{
-      "open" => last_price,
-      "high" => last_price,
-      "low" => last_price,
-      "close" => last_price,
-      "volume" => 0,
-      "trades" => 0,
-      "stime" => stime,
-      "etime" => etime,
-      "processed" => true
-    }
+  defp forward_candle(last_price, stime, etime) do
+    generate_empty_candle()
+    |> Map.put("open", last_price)
+    |> Map.put("close", last_price)
+    |> Map.put("stime", stime)
+    |> Map.put("etime", etime)
+    |> Map.put("processed", true)
   end
 
   # Creates new candle.
