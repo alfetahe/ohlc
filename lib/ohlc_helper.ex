@@ -8,32 +8,32 @@ defmodule OHLCHelper do
 
   `
     %{
-      "etime" => 0,
-      "stime" => 0,
-      "open" => 0,
-      "high" => 0,
-      "low" => 0,
-      "close" => 0,
-      "volume" => 0,
-      "trades" => 0,
-      "type" => nil,
-      "processed" => false
+      :etime => 0,
+      :stime => 0,
+      :open => 0,
+      :high => 0,
+      :low => 0,
+      :close => 0,
+      :volume => 0,
+      :trades => 0,
+      :type => nil,
+      :processed => false
     }
   `
   """
   @spec generate_empty_candle :: map()
   def generate_empty_candle() do
     %{
-      "etime" => 0,
-      "stime" => 0,
-      "open" => 0,
-      "high" => 0,
-      "low" => 0,
-      "close" => 0,
-      "volume" => 0,
-      "trades" => 0,
-      "type" => nil,
-      "processed" => false
+      :etime => 0,
+      :stime => 0,
+      :open => 0,
+      :high => 0,
+      :low => 0,
+      :close => 0,
+      :volume => 0,
+      :trades => 0,
+      :type => nil,
+      :processed => false
     }
   end
 
@@ -94,6 +94,23 @@ defmodule OHLCHelper do
       :struct -> rounded_time
       _ -> DateTime.to_unix(rounded_time)
     end
+  end
+
+  @doc """
+  Calculates the total volume from trades.
+  """
+  @spec trades_total_volume(list()) :: float
+  def trades_total_volume(trades) do
+    Enum.reduce(trades, fn trade, acc ->
+      volume_formatted = format_to_float(trade[:volume])
+
+      if is_float(acc) do
+        acc + volume_formatted
+      else
+        format_to_float(acc[:volume]) + volume_formatted
+      end
+    end)
+    |> Float.round(4)
   end
 
   @doc """
@@ -173,7 +190,7 @@ defmodule OHLCHelper do
 
     worked_time_struct =
       if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 and
-            days_to_calc === 7 do
+           days_to_calc === 7 do
         time_struct
       else
         DateTime.add(time_struct, 86_400 * days_to_calc, :second)
@@ -203,15 +220,16 @@ defmodule OHLCHelper do
   defp validate_candles(candles) do
     empty_candle = generate_empty_candle()
 
-    data_validated = Enum.all?(candles, fn candle ->
-      if (is_map(candle)) do
-        Enum.all?(empty_candle, fn el ->
-          Map.has_key?(candle, el |> elem(0))
-        end)
-      else
-        false
-      end
-    end)
+    data_validated =
+      Enum.all?(candles, fn candle ->
+        if is_map(candle) do
+          Enum.all?(empty_candle, fn el ->
+            Map.has_key?(candle, el |> elem(0))
+          end)
+        else
+          false
+        end
+      end)
 
     if data_validated do
       :ok
@@ -275,5 +293,4 @@ defmodule OHLCHelper do
         :ok
     end
   end
-
 end
