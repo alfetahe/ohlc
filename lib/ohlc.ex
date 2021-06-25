@@ -2,6 +2,16 @@ defmodule OHLC do
   @moduledoc """
   Library for generating OHLC candles from trades.
 
+
+  OHLC takes ordered list of trade events as input and
+  outputs OHLC candles list.
+
+  Library includes few options for appending candles to existing candles lists and more.
+
+  This library could be useful if you want to create your own charting engine or trading bot.
+
+  Documentation can be found here: https://hexdocs.pm/ohlc/1.0.0/OHLC.html
+
   ## Installation
 
   The package can be installed by adding `ohlc` to your
@@ -15,7 +25,7 @@ defmodule OHLC do
   end
   ```
 
-  ## Example
+  ## Example usage
   ```elixir
   defmodule Example do
     def calculate_ohlc() do
@@ -32,6 +42,64 @@ defmodule OHLC do
       end
     end
   end
+  ```
+
+  ## Example output
+  ```elixir
+  %{
+    candles: [
+      %{
+        close: 11.0,
+        etime: 1616440800,
+        high: 11.0,
+        low: 11.0,
+        open: 11.0,
+        processed: true,
+        stime: 1616440740,
+        trades: 1,
+        type: :bearish,
+        volume: 43.0
+      },
+      %{
+        close: 18.9,
+        etime: 1616440740,
+        high: 18.9,
+        low: 18.9,
+        open: 18.9,
+        processed: true,
+        stime: 1616440680,
+        trades: 1,
+        type: :bullish,
+        volume: 12.0
+      },
+      %{
+        close: 12.56,
+        etime: 1616440620,
+        high: 12.56,
+        low: 12.56,
+        open: 12.56,
+        processed: true,
+        stime: 1616440560,
+        trades: 1,
+        type: :bullish,
+        volume: 18.3
+      },
+      %{
+        close: 12.0,
+        etime: 1616439660,
+        high: 12.0,
+        low: 12.0,
+        open: 12.0,
+        processed: true,
+        stime: 1616439600,
+        trades: 1,
+        type: :bullish,
+        volume: 22.0
+      }
+    ],
+    pair: nil,
+    timeframe: :minute
+  }
   ```
 
   """
@@ -87,11 +155,13 @@ defmodule OHLC do
   generating the candles to avoid errors and misinformation.
   - `:previous_candle` - Trades are appended to the previous candle if possible
   before generating the new candles.
+  - `:pair` - Adds the pair name to the returned outputs metadata.
   """
   @type opts :: [
           {:forward_fill, boolean()}
           | {:validate_trades, boolean()}
           | {:previous_candle, candle()}
+          | {:pair, atom() | binary()}
         ]
 
   @doc """
