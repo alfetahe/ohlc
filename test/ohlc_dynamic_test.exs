@@ -1,6 +1,10 @@
-defmodule CandlooDynamicTest do
+defmodule OHLCDynamicTest do
   use ExUnit.Case
-  doctest Candloo
+
+  import OHLC
+  import OHLCHelper
+
+  doctest OHLC
 
   @timeframes [{:minute, 60}, {:hour, 3600}, {:day, 86_400}, {:week, 604_800}]
 
@@ -90,7 +94,7 @@ defmodule CandlooDynamicTest do
         timeframe_divider
       )
 
-    {:ok, data} = Candloo.create_candles(trades, timeframe)
+    {:ok, data} = create_candles(trades, timeframe)
 
     volume_to_check = ((@timeframes[timeframe] / timeframe_divider) |> trunc()) * volume
 
@@ -105,9 +109,9 @@ defmodule CandlooDynamicTest do
       Enum.at(data["candles"], 0)["trades"] === length(trades) and
       Enum.at(data["candles"], 0)["volume"] === volume_to_check and
       Enum.at(data["candles"], 0)["stime"] ===
-        Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, type: :substract) and
+        get_time_rounded(Enum.at(trades, -1)[:time], timeframe, type: :start) and
       Enum.at(data["candles"], 0)["etime"] ===
-        Candloo.get_etime_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
+        get_time_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
   end
 
   defp generate_single_candle_trades(
@@ -130,8 +134,8 @@ defmodule CandlooDynamicTest do
       # Uneven number means selling and even buying side.
       side =
         case rem(numb, 2) do
-          1 -> "s"
-          0 -> "b"
+          1 -> :s
+          0 -> :b
         end
 
       price =
