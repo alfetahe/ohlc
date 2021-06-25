@@ -117,6 +117,14 @@ defmodule OHLCStaticTest do
 
   # Error tests
 
+  test "Data key not correct and must return an error" do
+    case create_candles(data_key_value_wrong(), :minute, validate_trades: true) do
+      {:error, _} -> assert(true)
+      {:ok, _} -> assert(false)
+      _ -> assert(false)
+    end
+  end
+
   test "Trades list is not sequenced by date and must return an error" do
     case create_candles(data_not_sequenced(), :minute, validate_trades: true) do
       {:error, _} -> assert(true)

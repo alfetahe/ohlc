@@ -16,6 +16,7 @@ defmodule OHLCHelper do
       "close" => 0,
       "volume" => 0,
       "trades" => 0,
+      "type" => nil,
       "processed" => false
     }
   `
@@ -31,6 +32,7 @@ defmodule OHLCHelper do
       "close" => 0,
       "volume" => 0,
       "trades" => 0,
+      "type" => nil,
       "processed" => false
     }
   end
@@ -91,6 +93,26 @@ defmodule OHLCHelper do
       :stamp -> DateTime.to_unix(rounded_time)
       :struct -> rounded_time
       _ -> DateTime.to_unix(rounded_time)
+    end
+  end
+
+  @doc """
+  Validates the data used for generating the OHLC candles.
+  Accepts lists of candles, trades or both.
+  """
+  @spec validate_data(list() | nil, list() | nil) :: :ok | {:error, binary()}
+  def validate_data(candles \\ [], trades \\ []) do
+    case validate_candles(candles) do
+      {:error, candles_error_msg} ->
+        {:error, candles_error_msg}
+
+      :ok ->
+        trades_validated = validate_trades(trades)
+
+        case trades_validated do
+          {:error, trades_error_msg} -> {:error, trades_error_msg}
+          :ok -> :ok
+        end
     end
   end
 
@@ -177,4 +199,81 @@ defmodule OHLCHelper do
       nil -> timestruct
     end
   end
+
+  defp validate_candles(candles) do
+    empty_candle = generate_empty_candle()
+
+    data_validated = Enum.all?(candles, fn candle ->
+      if (is_map(candle)) do
+        Enum.all?(empty_candle, fn el ->
+          Map.has_key?(candle, el |> elem(0))
+        end)
+      else
+        false
+      end
+    end)
+
+    if data_validated do
+      :ok
+    else
+      {:error, "Candles must be type of map containing all the neccessary keys."}
+    end
+  end
+
+  defp validate_trades(trades, prev_etime \\ nil)
+
+  defp validate_trades([trades_head | trades_body], prev_etime) do
+    trade_fields = [:price, :volume, :time]
+
+    keys_validated = Enum.all?(trade_fields, &trades_head[&1])
+
+    case keys_validated do
+      true ->
+        trade_data_validated = validate_trade_data(trades_head, prev_etime)
+
+        case trade_data_validated do
+          :ok -> validate_trades(trades_body, trades_head[:time])
+          {:error, msg} -> {:error, msg}
+        end
+
+      false ->
+        {:error, "Trades list does not contain all necessary keys"}
+    end
+  end
+
+  defp validate_trades([], _prev_etime) do
+    :ok
+  end
+
+  defp validate_trade_data(trade, prev_etime) do
+    price_validation = is_float(format_to_float(trade[:price]))
+    volume_validation = is_float(format_to_float(trade[:volume]))
+    time_validation = is_float(format_to_float(trade[:time]))
+
+    etime_greater =
+      cond do
+        prev_etime === nil -> true
+        time_validation -> format_to_float(trade[:time]) >= format_to_float(prev_etime) || false
+        true -> false
+      end
+
+    cond do
+      !price_validation ->
+        {:error, "Price is not float: #{format_to_float(trade[:price])}"}
+
+      !volume_validation ->
+        {:error, "Volume is not float: #{format_to_float(trade[:volume])}"}
+
+      !time_validation ->
+        {:error, "Time is not float: #{format_to_float(trade[:volume])}"}
+
+      !etime_greater ->
+        {:error,
+         "Current trade time(#{format_to_float(trade[:time])}) is not bigger or equal to the previous trade time(#{format_to_float(prev_etime)})"}
+
+      true ->
+        :ok
+    end
+  end
+
 end
