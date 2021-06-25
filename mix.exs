@@ -4,8 +4,10 @@ defmodule OHLC.MixProject do
   def project do
     [
       app: :ohlc,
-      version: "0.1.0",
-      elixir: "~> 1.12",
+      version: "1.0.0",
+      elixir: "~> 1.0",
+      description: description(),
+      package: package(),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -23,6 +25,19 @@ defmodule OHLC.MixProject do
     [
       {:decimal, "~> 2.0"},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+    ]
+  end
+
+  defp description() do
+    "Package for generating OHLC candles from trades."
+  end
+
+  defp package() do
+    [
+      # These are the default files included in the package
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
+      licenses: ["GPL-3.0"],
+      links: %{"GitHub" => "https://github.com/tradebase-technology/ohlc"}
     ]
   end
 end
