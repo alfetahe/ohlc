@@ -6,6 +6,12 @@ defmodule OHLCStaticTest do
 
   doctest OHLC
 
+  test "Candle forward fill" do
+    {:ok, data} = create_candles(forward_filling_data_1(), :hour, [forward_fill: true])
+
+    assert(length(data[:candles]) === 12)
+  end
+
   test "Candle appending" do
     trades_1 = single_min_data_1()
     {:ok, data} = create_candles(trades_1, :minute)
@@ -62,6 +68,15 @@ defmodule OHLCStaticTest do
       {:ok, _} -> assert(false)
       _ -> assert(false)
     end
+  end
+
+  def forward_filling_data_1() do
+    [
+      [price: "0.23", volume: "0.2", time: "1624613906"],
+      [price: "0.23", volume: "0.2", time: "1624635506"],
+      [price: "0.14", volume: "150.2", time: "1624649906"],
+      [price: "0.193", volume: "3", time: "1624653506"],
+    ]
   end
 
   def single_min_data_1 do

@@ -23,7 +23,6 @@ defmodule OHLC.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:decimal, "~> 2.0"},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
