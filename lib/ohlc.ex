@@ -2,13 +2,44 @@ defmodule OHLC do
   @moduledoc """
   Library for generating OHLC candles from trades.
 
+  ## Installation
+
+  The package can be installed by adding `ohlc` to your
+  list of dependencies in `mix.exs`:
+
+  ```elixir
+  def deps do
+    [
+      {:ohlc, "~> 1.0"}
+    ]
+  end
+  ```
+
+  ## Example
+  ```elixir
+  defmodule Example do
+    def calculate_ohlc() do
+      trades = [
+        [price: 12, volume: 22, time: 1616439602],
+        [price: 12.56, volume: 18.3, time: 1616440572],
+        [price: 18.9, volume: 12, time: 1616440692],
+        [price: 11, volume: 43, time: 1616440759]
+      ]
+
+      case OHLC.create_candles(trades, :minute, [validate_trades: true]) do
+        {:ok, data} -> IO.inspect data
+        {:error, msg} -> IO.puts msg
+      end
+    end
+  end
+  ```
 
   """
 
   import OHLCHelper
 
   @typedoc """
-  Single trade piece. This is the correct format for the trade in the trades list.
+  Single trade.
   """
   @type trade :: [
           {:price, number()}
@@ -16,10 +47,31 @@ defmodule OHLC do
           | {:time, number()}
         ]
 
-  @doc """
+  @typedoc """
   A list of trades.
   """
   @type trades :: [trade()]
+
+  @typedoc """
+  Single candle generated.
+  """
+  @type candle :: %{
+          required(:open) => number(),
+          required(:high) => number(),
+          required(:low) => number(),
+          required(:close) => number(),
+          required(:volume) => number(),
+          required(:trades) => number(),
+          required(:stime) => number(),
+          required(:etime) => number(),
+          required(:type) => :bullish | :bearish | nil,
+          optional(:processed) => boolean()
+        }
+
+  @typedoc """
+  A list of candles.
+  """
+  @type candles :: [candle()]
 
   @typedoc """
   Available timeframes for `create_candles/3`
@@ -39,11 +91,29 @@ defmodule OHLC do
   @type opts :: [
           {:forward_fill, boolean()}
           | {:validate_trades, boolean()}
-          | {:previous_candle, map() | nil}
+          | {:previous_candle, candle()}
         ]
 
+  @doc """
+  Function for generating candles from trades and timeframe provided.
+
+  Parameters:
+  - `trades` - A list containing all the trades. Trades must be
+  chronologically arranged(ASC) by the timestamp field.
+  - `timeframe` - Timeframe for the candles.
+  - `opts` - Option values for the data proccessing.
+
+  Returns a tuple containing the metadata for the candles and a list
+  of generated candles.
+  """
   @spec create_candles(trades(), timeframe(), opts() | nil) ::
-          {:ok, map()} | {:error, binary()}
+          {:ok,
+           %{
+             :pair => binary() | atom(),
+             :timeframe => timeframe(),
+             :candles => candles()
+           }}
+          | {:error, binary()}
   def create_candles(trades, timeframe, opts \\ []) do
     candles =
       cond do

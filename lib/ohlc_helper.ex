@@ -5,23 +5,8 @@ defmodule OHLCHelper do
 
   @doc """
   Generates and returns empty candle.
-
-  `
-    %{
-      :etime => 0,
-      :stime => 0,
-      :open => 0,
-      :high => 0,
-      :low => 0,
-      :close => 0,
-      :volume => 0,
-      :trades => 0,
-      :type => nil,
-      :processed => false
-    }
-  `
   """
-  @spec generate_empty_candle :: map()
+  @spec generate_empty_candle() :: OHLC.candle()
   def generate_empty_candle() do
     %{
       :etime => 0,
@@ -52,6 +37,7 @@ defmodule OHLCHelper do
 
   @doc """
   Gets the rounded timestamp based on the timeframe.
+
   Parameters:
   - `timestamp` - Unix timestamp which will be rounded.
   - `timeframe` - Timeframe used for rounding the timestamp.
@@ -63,6 +49,7 @@ defmodule OHLCHelper do
     - `{:type, :down | :up | :jump}` - Timestamp will be rounded
     up, down or jump to the next time cycle. Default is `:up`.
   """
+  @spec get_time_rounded(number(), OHLC.timeframe(), list() | nil) :: number() | DateTime
   def get_time_rounded(timestamp, timeframe, opts \\ []) do
     timestamp = timestamp |> format_to_float() |> round()
 
@@ -99,7 +86,7 @@ defmodule OHLCHelper do
   @doc """
   Calculates the total volume from trades.
   """
-  @spec trades_total_volume(list()) :: float
+  @spec trades_total_volume(OHLC.trades()) :: float
   def trades_total_volume(trades) do
     Enum.reduce(trades, fn trade, acc ->
       volume_formatted = format_to_float(trade[:volume])
@@ -117,7 +104,7 @@ defmodule OHLCHelper do
   Validates the data used for generating the OHLC candles.
   Accepts lists of candles, trades or both.
   """
-  @spec validate_data(list() | nil, list() | nil) :: :ok | {:error, binary()}
+  @spec validate_data(OHLC.candles() | nil, OHLC.trades() | nil) :: :ok | {:error, binary()}
   def validate_data(candles \\ [], trades \\ []) do
     case validate_candles(candles) do
       {:error, candles_error_msg} ->
