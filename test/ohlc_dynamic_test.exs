@@ -131,13 +131,6 @@ defmodule OHLCDynamicTest do
     Enum.map(1..items_to_loop, fn numb ->
       numb_multiplied = numb * timeframe_divider
 
-      # Uneven number means selling and even buying side.
-      side =
-        case rem(numb, 2) do
-          1 -> :s
-          0 -> :b
-        end
-
       price =
         cond do
           numb === 1 ->
@@ -156,8 +149,7 @@ defmodule OHLCDynamicTest do
       [
         price: price,
         volume: volume,
-        time: timestamp_multipled + numb_multiplied,
-        side: side
+        time: timestamp_multipled + numb_multiplied
       ]
     end)
   end

@@ -14,7 +14,6 @@ defmodule OHLC do
           {:price, number()}
           | {:volume, number()}
           | {:time, number()}
-          | {:side, :b | :s}
         ]
 
   @typedoc """
@@ -105,7 +104,7 @@ defmodule OHLC do
   defp validate_trades(trades, prev_etime \\ nil)
 
   defp validate_trades([trades_head | trades_body], prev_etime) do
-    trade_fields = [:price, :volume, :time, :side]
+    trade_fields = [:price, :volume, :time]
 
     keys_validated = Enum.all?(trade_fields, &trades_head[&1])
 
@@ -131,7 +130,6 @@ defmodule OHLC do
     price_validation = is_float(format_to_float(trade[:price]))
     volume_validation = is_float(format_to_float(trade[:volume]))
     time_validation = is_float(format_to_float(trade[:time]))
-    side_validation = trade[:side] === :s or trade[:side] === :b || false
 
     etime_greater =
       cond do
@@ -149,9 +147,6 @@ defmodule OHLC do
 
       !time_validation ->
         {:error, "Time is not float: #{format_to_float(trade[:volume])}"}
-
-      !side_validation ->
-        {:error, "Side is incorrect: #{trade[:side]}"}
 
       !etime_greater ->
         {:error,
