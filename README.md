@@ -69,7 +69,7 @@ end
       processed: true,
       stime: 1616440680,
       trades: 1,
-      type: :bullish,
+      type: :bearish,
       volume: 12.0
     },
     %{
@@ -81,7 +81,7 @@ end
       processed: true,
       stime: 1616440560,
       trades: 1,
-      type: :bullish,
+      type: :bearish,
       volume: 18.3
     },
     %{
@@ -93,7 +93,7 @@ end
       processed: true,
       stime: 1616439600,
       trades: 1,
-      type: :bullish,
+      type: :bearish,
       volume: 22.0
     }
   ],
