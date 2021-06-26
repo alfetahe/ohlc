@@ -18,28 +18,28 @@ defmodule OHLCStaticHourlyTest do
     trades = single_hourly_candle_1() ++ single_hourly_candle_2()
     {:ok, data} = create_candles(trades, :hour, forward_fill: true)
 
-    first_candle = Enum.at(data[:candles], 1)
-    second_candle = Enum.at(data[:candles], 0)
+    first_candle = Enum.at(data[:candles], 0)
+    last_candle = Enum.at(data[:candles], 1)
 
     assert length(data[:candles]) === 2 and
-             first_candle[:type] === :bullish and
-             first_candle[:open] === 12.0 and
-             first_candle[:high] === 2222.0 and
-             first_candle[:low] === 11.0 and
-             first_candle[:close] === 98.4 and
-             first_candle[:volume] === 127.73 and
-             first_candle[:stime] === 1_616_439_600 and
-             first_candle[:etime] === 1_616_443_200 and
+             first_candle[:type] === :bearish and
+             first_candle[:open] === 125.54 and
+             first_candle[:high] === 129.32 and
+             first_candle[:low] === 19.3 and
+             first_candle[:close] === 119.4 and
+             first_candle[:volume] === 41.142 and
+             first_candle[:stime] === 1_616_436_000 and
+             first_candle[:etime] === 1_616_439_600 and
              first_candle[:trades] === 9 and
-             second_candle[:type] === :bearish and
-             second_candle[:open] === 125.54 and
-             second_candle[:high] === 129.32 and
-             second_candle[:low] === 19.3 and
-             second_candle[:close] === 119.4 and
-             second_candle[:volume] === 41.142 and
-             second_candle[:stime] === 1_616_436_000 and
-             second_candle[:etime] === 1_616_439_600 and
-             second_candle[:trades] === 9
+             last_candle[:type] === :bullish and
+             last_candle[:open] === 12.0 and
+             last_candle[:high] === 2222.0 and
+             last_candle[:low] === 11.0 and
+             last_candle[:close] === 98.4 and
+             last_candle[:volume] === 127.73 and
+             last_candle[:stime] === 1_616_439_600 and
+             last_candle[:etime] === 1_616_443_200 and
+             last_candle[:trades] === 9
   end
 
   defp single_hourly_candle_1 do

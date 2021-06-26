@@ -202,7 +202,8 @@ defmodule OHLC do
 
   Parameters:
 
-  `timeframe`-  Must be higher then the existing candles have.
+  `candles` - A list of candles.
+  `timeframe`-  Must be higher then the existing candles timeframe.
   For example if candles were previously created using :hour timeframe
   then the provided timeframe cannot be :minute.
 
@@ -216,15 +217,16 @@ defmodule OHLC do
   defp timeframe_conv_loop([chd | ctl], timeframe, [cchd | cctl] = conv_candles, active_stamp) do
     active_stamp = set_active_conv_stamp(chd[:stime], active_stamp, timeframe)
 
-    conv_candles = if (chd[:etime] > active_stamp) do
-      new_candle = set_conv_candle(chd, timeframe)
+    conv_candles =
+      if chd[:etime] > active_stamp do
+        new_candle = set_conv_candle(chd, timeframe)
 
-      [new_candle | conv_candles]
-    else
-      updated_candle = update_conv_candle(chd, cchd)
+        [new_candle | conv_candles]
+      else
+        updated_candle = update_conv_candle(chd, cchd)
 
-      [updated_candle | cctl]
-    end
+        [updated_candle | cctl]
+      end
 
     timeframe_conv_loop(ctl, timeframe, conv_candles, active_stamp)
   end
@@ -243,8 +245,8 @@ defmodule OHLC do
   end
 
   defp set_active_conv_stamp(candle_stamp, active_stamp, timeframe) do
-    if (candle_stamp > active_stamp) do
-      get_time_rounded(candle_stamp, timeframe, [type: :up])
+    if candle_stamp > active_stamp do
+      get_time_rounded(candle_stamp, timeframe, type: :up)
     else
       active_stamp
     end
@@ -252,18 +254,18 @@ defmodule OHLC do
 
   defp set_conv_candle(chd, timeframe) do
     chd
-    |> Map.put(:stime, get_time_rounded(chd[:stime], timeframe, [type: :down]))
-    |> Map.put(:etime, get_time_rounded(chd[:stime], timeframe, [type: :up]))
+    |> Map.put(:stime, get_time_rounded(chd[:stime], timeframe, type: :down))
+    |> Map.put(:etime, get_time_rounded(chd[:stime], timeframe, type: :up))
   end
 
   defp update_conv_candle(chd, cchd) do
     cchd
-      |> Map.update(:volume, 0, fn vol -> vol + chd[:volume] |> Float.round(4) end)
-      |> Map.update(:trades, 0, fn trades -> trades + chd[:trades] end)
-      |> Map.update(:trades, 0, fn high -> if (high < chd[:high]), do: chd[:high], else: high  end)
-      |> Map.update(:trades, 0, fn low -> if (low > chd[:low]), do: chd[:low], else: low  end)
-      |> Map.put(:close, chd[:close])
-      |> Map.update(:type, nil, fn _type -> get_candle_type(cchd[:open], chd[:close]) end)
+    |> Map.update(:volume, 0, fn vol -> (vol + chd[:volume]) |> Float.round(4) end)
+    |> Map.update(:trades, 0, fn trades -> trades + chd[:trades] end)
+    |> Map.update(:trades, 0, fn high -> if high < chd[:high], do: chd[:high], else: high end)
+    |> Map.update(:trades, 0, fn low -> if low > chd[:low], do: chd[:low], else: low end)
+    |> Map.put(:close, chd[:close])
+    |> Map.update(:type, nil, fn _type -> get_candle_type(cchd[:open], chd[:close]) end)
   end
 
   defp construct_candles(candles, trades, timeframe, opts) do
@@ -360,7 +362,7 @@ defmodule OHLC do
         copied_candle =
           forward_candle(
             candles_head[:close],
-            candles_head_etime_added,
+            get_time_rounded(candles_head[:etime], timeframe, type: :up),
             candles_head_etime_added
           )
 
@@ -398,7 +400,7 @@ defmodule OHLC do
 
   # Returns updated candle.
   defp update_candle(candle, trade, prev_close) do
-    type =  get_candle_type(candle[:open], trade[:price])
+    type = get_candle_type(candle[:open], trade[:price])
 
     %{
       candle
