@@ -69,7 +69,7 @@ defmodule OHLC do
         processed: true,
         stime: 1616440680,
         trades: 1,
-        type: :bullish,
+        type: :bearish,
         volume: 12.0
       },
       %{
@@ -81,7 +81,7 @@ defmodule OHLC do
         processed: true,
         stime: 1616440560,
         trades: 1,
-        type: :bullish,
+        type: :bearish,
         volume: 18.3
       },
       %{
@@ -93,7 +93,7 @@ defmodule OHLC do
         processed: true,
         stime: 1616439600,
         trades: 1,
-        type: :bullish,
+        type: :bearish,
         volume: 22.0
       }
     ],
@@ -195,6 +195,44 @@ defmodule OHLC do
       end
 
     construct_candles(candles, trades, timeframe, opts)
+  end
+
+  @doc """
+  Coverts candles to new timeframe.
+
+  Returns a list of candles with converted timeframe.
+  """
+  @spec convert_timeframe(candles(), timeframe()) :: candles()
+  def convert_timeframe(candles, timeframe) do
+    timeframe_conv_loop(candles, timeframe, [], 0)
+  end
+
+  defp timeframe_conv_loop([chd | ctl], timeframe, [cchd | cctl] = conv_candles, active_stamp) do
+    conv_candles = if (chd[:stime] >= active_stamp) do
+      active_stamp = get_time_rounded(chd[:stime], timeframe, [type: :up])
+
+      new_candle = chd
+      |> Map.put(:stime, get_time_rounded(chd[:stime], timeframe, [type: :down]))
+      |> Map.put(:etime, active_stamp)
+
+      [new_candle | conv_candles]
+    else
+      updated_candle = cchd
+      |> Map.update(:volume, 0, fn vol -> vol + chd[:volume] |> Float.round(4) end)
+      |> Map.update(:trades, 0, fn trades -> trades + chd[:trades] end)
+      |> Map.update(:trades, 0, fn high -> if (high < chd[:high]), do: chd[:high], else: high  end)
+      |> Map.update(:trades, 0, fn low -> if (low > chd[:low]), do: chd[:low], else: low  end)
+      |> Map.put(:close, chd[:close])
+      |> Map.update(:type, nil, fn _type -> get_candle_type(cchd[:open], chd[:close]) end)
+
+      [updated_candle | cctl]
+    end
+
+    timeframe_conv_loop(ctl, timeframe, conv_candles, active_stamp)
+  end
+
+  defp timeframe_conv_loop([], _timeframe, conv_candles, _active_stamp) do
+    conv_candles
   end
 
   defp construct_candles(candles, trades, timeframe, opts) do
@@ -312,7 +350,7 @@ defmodule OHLC do
 
   # Creates new candle.
   defp create_candle(trade, timeframe, prev_close \\ nil) do
-    type = if trade[:price] > prev_close, do: :bullish, else: :bearish
+    type = get_candle_type(trade[:price], trade[:price])
 
     generate_empty_candle()
     |> Map.put(:open, trade[:price])
@@ -329,7 +367,7 @@ defmodule OHLC do
 
   # Returns updated candle.
   defp update_candle(candle, trade, prev_close) do
-    type = if trade[:price] > prev_close, do: :bullish, else: :bearish
+    type =  get_candle_type(candle[:open], trade[:price])
 
     %{
       candle
