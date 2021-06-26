@@ -49,28 +49,16 @@ defmodule OHLC do
   %{
     candles: [
       %{
-        close: 11.0,
-        etime: 1616440800,
-        high: 11.0,
-        low: 11.0,
-        open: 11.0,
+        close: 12.0,
+        etime: 1616439660,
+        high: 12.0,
+        low: 12.0,
+        open: 12.0,
         processed: true,
-        stime: 1616440740,
+        stime: 1616439600,
         trades: 1,
         type: :bearish,
-        volume: 43.0
-      },
-      %{
-        close: 18.9,
-        etime: 1616440740,
-        high: 18.9,
-        low: 18.9,
-        open: 18.9,
-        processed: true,
-        stime: 1616440680,
-        trades: 1,
-        type: :bearish,
-        volume: 12.0
+        volume: 22.0
       },
       %{
         close: 12.56,
@@ -85,16 +73,28 @@ defmodule OHLC do
         volume: 18.3
       },
       %{
-        close: 12.0,
-        etime: 1616439660,
-        high: 12.0,
-        low: 12.0,
-        open: 12.0,
+        close: 18.9,
+        etime: 1616440740,
+        high: 18.9,
+        low: 18.9,
+        open: 18.9,
         processed: true,
-        stime: 1616439600,
+        stime: 1616440680,
         trades: 1,
         type: :bearish,
-        volume: 22.0
+        volume: 12.0
+      },
+      %{
+        close: 11.0,
+        etime: 1616440800,
+        high: 11.0,
+        low: 11.0,
+        open: 11.0,
+        processed: true,
+        stime: 1616440740,
+        trades: 1,
+        type: :bearish,
+        volume: 43.0
       }
     ],
     pair: nil,
@@ -308,15 +308,12 @@ defmodule OHLC do
       cond do
         # Appends new candle to the candles list without the unprocessed candle.
         !candles_head[:processed] ->
-          candle = create_candle(formatted_trade_data, timeframe, candles_head[:close])
+          candle = create_candle(formatted_trade_data, timeframe)
           [[candle] ++ candles_body, trades_tail]
 
         # Updates last candle.
         dates_match === :eq ->
-          prev_candle = Enum.at(candles_body, 0)
-          prev_close = if prev_candle, do: prev_candle[:close], else: 0
-
-          updated_candle = update_candle(candles_head, formatted_trade_data, prev_close)
+          updated_candle = update_candle(candles_head, formatted_trade_data)
           [[updated_candle] ++ candles_body, trades_tail]
 
         # Creates new candle or candles.
@@ -326,7 +323,7 @@ defmodule OHLC do
               copy_or_create_loop([candles_head | candles_body], trades, timeframe)
 
             _ ->
-              candle = create_candle(formatted_trade_data, timeframe, candles_head[:close])
+              candle = create_candle(formatted_trade_data, timeframe)
               [[candle] ++ candles, trades_tail]
           end
       end
@@ -382,7 +379,7 @@ defmodule OHLC do
   end
 
   # Creates new candle.
-  defp create_candle(trade, timeframe, prev_close \\ nil) do
+  defp create_candle(trade, timeframe) do
     type = get_candle_type(trade[:price], trade[:price])
 
     generate_empty_candle()
@@ -399,7 +396,7 @@ defmodule OHLC do
   end
 
   # Returns updated candle.
-  defp update_candle(candle, trade, prev_close) do
+  defp update_candle(candle, trade) do
     type = get_candle_type(candle[:open], trade[:price])
 
     %{

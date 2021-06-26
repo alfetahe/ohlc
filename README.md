@@ -49,28 +49,16 @@ end
 %{
   candles: [
     %{
-      close: 11.0,
-      etime: 1616440800,
-      high: 11.0,
-      low: 11.0,
-      open: 11.0,
+      close: 12.0,
+      etime: 1616439660,
+      high: 12.0,
+      low: 12.0,
+      open: 12.0,
       processed: true,
-      stime: 1616440740,
+      stime: 1616439600,
       trades: 1,
       type: :bearish,
-      volume: 43.0
-    },
-    %{
-      close: 18.9,
-      etime: 1616440740,
-      high: 18.9,
-      low: 18.9,
-      open: 18.9,
-      processed: true,
-      stime: 1616440680,
-      trades: 1,
-      type: :bearish,
-      volume: 12.0
+      volume: 22.0
     },
     %{
       close: 12.56,
@@ -85,16 +73,28 @@ end
       volume: 18.3
     },
     %{
-      close: 12.0,
-      etime: 1616439660,
-      high: 12.0,
-      low: 12.0,
-      open: 12.0,
+      close: 18.9,
+      etime: 1616440740,
+      high: 18.9,
+      low: 18.9,
+      open: 18.9,
       processed: true,
-      stime: 1616439600,
+      stime: 1616440680,
       trades: 1,
       type: :bearish,
-      volume: 22.0
+      volume: 12.0
+    },
+    %{
+      close: 11.0,
+      etime: 1616440800,
+      high: 11.0,
+      low: 11.0,
+      open: 11.0,
+      processed: true,
+      stime: 1616440740,
+      trades: 1,
+      type: :bearish,
+      volume: 43.0
     }
   ],
   pair: nil,
