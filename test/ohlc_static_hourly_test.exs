@@ -5,12 +5,21 @@ defmodule OHLCStaticHourlyTest do
 
   doctest OHLC
 
+  test "Candle timeframe converting" do
+    trades = single_hourly_candle_1() ++ single_hourly_candle_2()
+
+    {:ok, data} = create_candles(trades, :minute)
+    converted_timeframe = convert_timeframe(data[:candles], :hour)
+
+    assert(length(converted_timeframe) == 2)
+  end
+
   test "Test 2 hourly candles" do
     trades = single_hourly_candle_1() ++ single_hourly_candle_2()
     {:ok, data} = create_candles(trades, :hour, forward_fill: true)
 
-    first_candle = Enum.at(data[:candles], 0)
-    second_candle = Enum.at(data[:candles], 1)
+    first_candle = Enum.at(data[:candles], 1)
+    second_candle = Enum.at(data[:candles], 0)
 
     assert length(data[:candles]) === 2 and
              first_candle[:type] === :bullish and
