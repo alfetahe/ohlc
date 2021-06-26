@@ -13,7 +13,7 @@ defmodule OHLCStaticHourlyTest do
     second_candle = Enum.at(data[:candles], 1)
 
     assert length(data[:candles]) === 2 and
-             first_candle[:type] === :bearish and
+             first_candle[:type] === :bullish and
              first_candle[:open] === 12.0 and
              first_candle[:high] === 2222.0 and
              first_candle[:low] === 11.0 and
@@ -22,11 +22,11 @@ defmodule OHLCStaticHourlyTest do
              first_candle[:stime] === 1_616_439_600 and
              first_candle[:etime] === 1_616_443_200 and
              first_candle[:trades] === 9 and
-             second_candle[:type] === :bullish and
+             second_candle[:type] === :bearish and
              second_candle[:open] === 125.54 and
-             second_candle[:high] === 130.0 and
+             second_candle[:high] === 129.32 and
              second_candle[:low] === 19.3 and
-             second_candle[:close] === 130.0 and
+             second_candle[:close] === 119.4 and
              second_candle[:volume] === 41.142 and
              second_candle[:stime] === 1_616_436_000 and
              second_candle[:etime] === 1_616_439_600 and
@@ -43,7 +43,7 @@ defmodule OHLCStaticHourlyTest do
       [price: 119, volume: 0.002, time: 1_616_439_119],
       [price: 119.654, volume: 0.89, time: 1_616_439_120],
       [price: 129.32, volume: 1.42, time: 1_616_439_302],
-      [price: 130.0, volume: 1, time: 1_616_439_600]
+      [price: 119.4, volume: 1, time: 1_616_439_600]
     ]
   end
 

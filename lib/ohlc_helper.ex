@@ -111,6 +111,20 @@ defmodule OHLCHelper do
   end
 
   @doc """
+  Gets the current candle type(pullish or bearish).
+
+  Returns
+  `:bullish` - if close price > open price.
+  `bearish` - if previous close price <= open price.
+  """
+  @spec get_candle_type(number(), number()) :: :bullish | :bearish
+  def get_candle_type(open, close) do
+    type = if close > open, do: :bullish, else: :bearish
+
+    type
+  end
+
+  @doc """
   Validates the data used for generating the OHLC candles.
   Accepts lists of candles, trades or both.
   """
