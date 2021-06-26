@@ -3,6 +3,16 @@ defmodule OHLCHelper do
   OHLC Helper module containing all the helper functions.
   """
 
+  @timeframes [minute: 60, hour: 3600, day: 86_400, week: 604_800]
+
+  @doc """
+  Returns all available timeframes in seconds.
+  """
+  @spec get_timeframes() :: list()
+  def get_timeframes() do
+    @timeframes
+  end
+
   @doc """
   Generates and returns empty candle.
   """
@@ -125,10 +135,10 @@ defmodule OHLCHelper do
       if time_struct.second === 0 do
         time_struct
       else
-        DateTime.add(time_struct, 60, :second)
+        DateTime.add(time_struct, get_timeframes()[:minute], :second)
       end
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], 60)
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:minute])
 
     %{
       unfinished_time_struct
@@ -144,10 +154,10 @@ defmodule OHLCHelper do
       if time_struct.second === 0 and time_struct.minute === 0 do
         time_struct
       else
-        DateTime.add(time_struct, 3600, :second)
+        DateTime.add(time_struct, get_timeframes()[:hour], :second)
       end
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], 3600)
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:hour])
 
     %{
       unfinished_time_struct
@@ -163,10 +173,10 @@ defmodule OHLCHelper do
       if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 do
         time_struct
       else
-        DateTime.add(time_struct, 86_400, :second)
+        DateTime.add(time_struct, get_timeframes()[:day], :second)
       end
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], 86_400)
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:day])
 
     %{unfinished_time_struct | day: worked_time_struct.day, hour: 0, minute: 0, second: 0}
   end
@@ -180,10 +190,10 @@ defmodule OHLCHelper do
            days_to_calc === 7 do
         time_struct
       else
-        DateTime.add(time_struct, 86_400 * days_to_calc, :second)
+        DateTime.add(time_struct, get_timeframes()[:day] * days_to_calc, :second)
       end
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], 604_800)
+    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:week])
 
     %{
       unfinished_time_struct
