@@ -21,11 +21,11 @@ defmodule OHLCHelper do
     %{
       :etime => 0,
       :stime => 0,
-      :open => 0,
-      :high => 0,
-      :low => 0,
-      :close => 0,
-      :volume => 0,
+      :open => 0.0,
+      :high => 0.0,
+      :low => 0.0,
+      :close => 0.0,
+      :volume => 0.0,
       :trades => 0,
       :type => nil,
       :processed => false
@@ -68,10 +68,10 @@ defmodule OHLCHelper do
     candle_time = %DateTime{
       year: time_struct.year,
       month: time_struct.month,
-      day: 0,
-      hour: 0,
-      minute: 0,
-      second: 0,
+      day: 00,
+      hour: 00,
+      minute: 00,
+      second: 00,
       time_zone: time_struct.time_zone,
       zone_abbr: time_struct.zone_abbr,
       utc_offset: time_struct.utc_offset,
@@ -145,87 +145,86 @@ defmodule OHLCHelper do
   end
 
   defp time_minute_worker(time_struct, unfinished_time_struct, opts) do
-    worked_time_struct =
-      if time_struct.second === 0 do
-        time_struct
-      else
-        DateTime.add(time_struct, get_timeframes()[:minute], :second)
-      end
+    timeframe_secs = get_timeframes()[:minute]
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:minute])
+    cond do
+      opts[:type] === :down ->
+        Map.put(time_struct, :second, 00)
 
-    %{
-      unfinished_time_struct
-      | day: worked_time_struct.day,
-        hour: worked_time_struct.hour,
-        minute: worked_time_struct.minute,
-        second: 0
-    }
+      opts[:type] === :up or opts[:type] === nil ->
+        Map.put(time_struct, :second, 59)
+
+      opts[:type] === :jump ->
+        DateTime.add(time_struct, timeframe_secs, :second) |> Map.put(:second, 00)
+    end
+    |> set_worked_time(unfinished_time_struct)
   end
 
   defp time_hour_worker(time_struct, unfinished_time_struct, opts) do
-    worked_time_struct =
-      if time_struct.second === 0 and time_struct.minute === 0 do
-        time_struct
-      else
-        DateTime.add(time_struct, get_timeframes()[:hour], :second)
-      end
+    timeframe_secs = get_timeframes()[:hour]
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:hour])
+    cond do
+      opts[:type] === :down ->
+        Map.put(time_struct, :second, 00) |> Map.put(:minute, 00)
 
-    %{
-      unfinished_time_struct
-      | day: worked_time_struct.day,
-        hour: worked_time_struct.hour,
-        minute: 0,
-        second: 0
-    }
+      opts[:type] === :up or opts[:type] === nil ->
+        Map.put(time_struct, :second, 59) |> Map.put(:minute, 59)
+
+      opts[:type] === :jump ->
+        DateTime.add(time_struct, timeframe_secs, :second)
+        |> Map.put(:second, 00) |> Map.put(:minute, 00)
+    end
+    |> set_worked_time(unfinished_time_struct)
   end
 
   defp time_day_worker(time_struct, unfinished_time_struct, opts) do
-    worked_time_struct =
-      if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 do
-        time_struct
-      else
-        DateTime.add(time_struct, get_timeframes()[:day], :second)
-      end
+    timeframe_secs = get_timeframes()[:day]
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:day])
+    cond do
+      opts[:type] === :down ->
+        Map.put(time_struct, :second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
 
-    %{unfinished_time_struct | day: worked_time_struct.day, hour: 0, minute: 0, second: 0}
+      opts[:type] === :up or opts[:type] === nil ->
+        Map.put(time_struct, :second, 59) |> Map.put(:minute, 59) |> Map.put(:hour, 23)
+
+      opts[:type] === :jump ->
+        DateTime.add(time_struct, timeframe_secs, :second)
+        |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
+    end
+    |> set_worked_time(unfinished_time_struct)
   end
 
   defp time_week_worker(time_struct, unfinished_time_struct, opts) do
+    timeframe_secs = get_timeframes()[:week]
     day_of_week = DateTime.to_date(time_struct) |> Date.day_of_week()
-    days_to_calc = 7 - day_of_week + 1
+    days_to_calc = 7 - day_of_week
 
-    worked_time_struct =
-      if time_struct.second === 0 and time_struct.minute === 0 and time_struct.hour === 0 and
-           days_to_calc === 7 do
-        time_struct
-      else
-        DateTime.add(time_struct, get_timeframes()[:day] * days_to_calc, :second)
-      end
+    time_struct = DateTime.add(time_struct, get_timeframes()[:day] * days_to_calc, :second)
 
-    worked_time_struct = time_worker(worked_time_struct, opts[:type], get_timeframes()[:week])
+    cond do
+      opts[:type] === :down ->
+        DateTime.add(time_struct, -(get_timeframes()[:day] * (day_of_week - 1)), :second)
+        |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
 
-    %{
-      unfinished_time_struct
-      | month: worked_time_struct.month,
-        day: worked_time_struct.day,
-        hour: 0,
-        minute: 0,
-        second: 0
-    }
+      opts[:type] === :up or opts[:type] === nil ->
+        Map.put(time_struct, :second, 59) |> Map.put(:minute, 59) |> Map.put(:hour, 23)
+
+      opts[:type] === :jump ->
+        DateTime.add(time_struct, timeframe_secs, :second)
+        |> DateTime.add(-(get_timeframes()[:day] * (day_of_week - 1)), :second)
+        |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
+    end
+    |> set_worked_time(unfinished_time_struct)
   end
 
-  defp time_worker(timestruct, type, timeframe_secs) do
-    case type do
-      :down -> DateTime.add(timestruct, -timeframe_secs, :second)
-      :jump -> DateTime.add(timestruct, timeframe_secs, :second)
-      :up -> timestruct
-      nil -> timestruct
-    end
+  defp set_worked_time(worked_timestruct, def_timestruct) do
+    %{
+      def_timestruct
+      | day: worked_timestruct.day,
+        hour: worked_timestruct.hour,
+        minute: worked_timestruct.minute,
+        second: worked_timestruct.second
+    }
   end
 
   defp validate_candles(candles) do
