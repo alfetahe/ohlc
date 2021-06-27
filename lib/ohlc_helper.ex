@@ -172,7 +172,8 @@ defmodule OHLCHelper do
 
       opts[:type] === :jump ->
         DateTime.add(time_struct, timeframe_secs, :second)
-        |> Map.put(:second, 00) |> Map.put(:minute, 00)
+        |> Map.put(:second, 00)
+        |> Map.put(:minute, 00)
     end
     |> set_worked_time(unfinished_time_struct)
   end
@@ -189,7 +190,9 @@ defmodule OHLCHelper do
 
       opts[:type] === :jump ->
         DateTime.add(time_struct, timeframe_secs, :second)
-        |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
+        |> Map.put(:second, 00)
+        |> Map.put(:minute, 00)
+        |> Map.put(:hour, 00)
     end
     |> set_worked_time(unfinished_time_struct)
   end
@@ -204,14 +207,18 @@ defmodule OHLCHelper do
     cond do
       opts[:type] === :down ->
         DateTime.add(time_struct, -(get_timeframes()[:day] * 7), :second)
-        |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
+        |> Map.put(:second, 00)
+        |> Map.put(:minute, 00)
+        |> Map.put(:hour, 00)
 
       opts[:type] === :up or opts[:type] === nil ->
         Map.put(time_struct, :second, 59) |> Map.put(:minute, 59) |> Map.put(:hour, 23)
 
       opts[:type] === :jump ->
         DateTime.add(time_struct, timeframe_secs, :second)
-        |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
+        |> Map.put(:second, 00)
+        |> Map.put(:minute, 00)
+        |> Map.put(:hour, 00)
     end
     |> set_worked_time(unfinished_time_struct)
   end

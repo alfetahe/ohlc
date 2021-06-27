@@ -19,7 +19,7 @@ defmodule OHLCStaticMinuteTest do
         candle[:close] === 18.11 and
         candle[:volume] === 1380.6 and
         candle[:stime] === 1_616_436_300 and
-        candle[:etime] === 1_616_436_360 and
+        candle[:etime] === 1_616_436_359 and
         candle[:trades] === 14
     )
   end
@@ -40,7 +40,7 @@ defmodule OHLCStaticMinuteTest do
         first_candle[:close] === 17.9 and
         first_candle[:volume] === 1.4 and
         first_candle[:stime] === 1_616_436_240 and
-        first_candle[:etime] === 1_616_436_300 and
+        first_candle[:etime] === 1_616_436_299 and
         first_candle[:trades] === 3 and
         last_candle[:type] === :bullish and
         last_candle[:open] === 15.0 and
@@ -49,7 +49,7 @@ defmodule OHLCStaticMinuteTest do
         last_candle[:close] === 18.11 and
         last_candle[:volume] === 1380.6 and
         last_candle[:stime] === 1_616_436_300 and
-        last_candle[:etime] === 1_616_436_360 and
+        last_candle[:etime] === 1_616_436_359 and
         last_candle[:trades] === 14
     )
   end
@@ -57,8 +57,8 @@ defmodule OHLCStaticMinuteTest do
   defp single_min_data_1() do
     [
       [price: 15, volume: 0.2, time: 1_616_436_287],
-      [price: 17, volume: 0.6, time: 1_616_436_299],
-      [price: 17.9, volume: 0.6, time: 1_616_436_300]
+      [price: 17, volume: 0.6, time: 1_616_436_292],
+      [price: 17.9, volume: 0.6, time: 1_616_436_299]
     ]
   end
 

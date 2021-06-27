@@ -9,7 +9,7 @@ defmodule OHLCStaticHourlyTest do
     trades = single_hourly_candle_1() ++ single_hourly_candle_2()
 
     {:ok, data} = create_candles(trades, :minute)
-    converted_timeframe = convert_timeframe(data[:candles], :hour)
+    {:ok, converted_timeframe} = convert_timeframe(data[:candles], :hour)
 
     assert(length(converted_timeframe) == 2)
   end
@@ -29,7 +29,7 @@ defmodule OHLCStaticHourlyTest do
              first_candle[:close] === 119.4 and
              first_candle[:volume] === 41.142 and
              first_candle[:stime] === 1_616_436_000 and
-             first_candle[:etime] === 1_616_439_600 and
+             first_candle[:etime] === 1_616_439_599 and
              first_candle[:trades] === 9 and
              last_candle[:type] === :bullish and
              last_candle[:open] === 12.0 and
@@ -38,7 +38,7 @@ defmodule OHLCStaticHourlyTest do
              last_candle[:close] === 98.4 and
              last_candle[:volume] === 127.73 and
              last_candle[:stime] === 1_616_439_600 and
-             last_candle[:etime] === 1_616_443_200 and
+             last_candle[:etime] === 1_616_443_199 and
              last_candle[:trades] === 9
   end
 
@@ -52,7 +52,7 @@ defmodule OHLCStaticHourlyTest do
       [price: 119, volume: 0.002, time: 1_616_439_119],
       [price: 119.654, volume: 0.89, time: 1_616_439_120],
       [price: 129.32, volume: 1.42, time: 1_616_439_302],
-      [price: 119.4, volume: 1, time: 1_616_439_600]
+      [price: 119.4, volume: 1, time: 1_616_439_599]
     ]
   end
 

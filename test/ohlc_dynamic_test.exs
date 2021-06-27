@@ -108,7 +108,7 @@ defmodule OHLCDynamicTest do
       Enum.at(data[:candles], 0)[:etime] ===
         get_time_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp) and
       Enum.at(data[:candles], 0)[:type] ===
-          get_candle_type(Enum.at(data[:candles], 0)[:open], Enum.at(data[:candles], 0)[:close])
+        get_candle_type(Enum.at(data[:candles], 0)[:open], Enum.at(data[:candles], 0)[:close])
   end
 
   defp generate_single_candle_trades(
@@ -123,7 +123,7 @@ defmodule OHLCDynamicTest do
 
     timestamp_multipled = @base_timestamp + timeframe * timeframe_multiplier
 
-    items_to_loop = (timeframe - 1) / timeframe_divider |> trunc()
+    items_to_loop = ((timeframe - 1) / timeframe_divider) |> trunc()
 
     Enum.map(1..items_to_loop, fn numb ->
       numb_multiplied = numb * timeframe_divider

@@ -34,8 +34,8 @@ defmodule OHLCStaticWeeklyTest do
              first_candle[:low] === 19.3 and
              first_candle[:close] === 19.3 and
              first_candle[:volume] === 37.83 and
-             first_candle[:stime] === 1_616_976_000 and
-             first_candle[:etime] === 1_617_580_800 and
+             first_candle[:stime] === 1_616_889_600 and
+             first_candle[:etime] === 1_617_580_799 and
              first_candle[:trades] === 5 and
              last_candle[:type] === :bullish and
              last_candle[:open] === 1.0 and
@@ -43,8 +43,8 @@ defmodule OHLCStaticWeeklyTest do
              last_candle[:low] === 1.0 and
              last_candle[:close] === 4.0 and
              last_candle[:volume] === 10.0 and
-             last_candle[:stime] === 1_617_580_800 and
-             last_candle[:etime] === 1_618_185_600 and
+             last_candle[:stime] === 1_617_494_400 and
+             last_candle[:etime] === 1_618_185_599 and
              last_candle[:trades] === 4
   end
 

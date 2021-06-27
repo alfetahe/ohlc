@@ -228,10 +228,8 @@ defmodule OHLC do
   end
 
   defp timeframe_conv_loop([chd | ctl], timeframe, [cchd | cctl] = conv_candles, active_stamp) do
-    active_stamp = set_active_conv_stamp(chd[:stime], active_stamp, timeframe)
-
     conv_candles =
-      if chd[:etime] > active_stamp do
+      if chd[:stime] >= active_stamp do
         new_candle = set_conv_candle(chd, timeframe)
 
         [new_candle | conv_candles]
@@ -240,6 +238,8 @@ defmodule OHLC do
 
         [updated_candle | cctl]
       end
+
+    active_stamp = set_active_conv_stamp(chd[:stime], active_stamp, timeframe)
 
     timeframe_conv_loop(ctl, timeframe, conv_candles, active_stamp)
   end

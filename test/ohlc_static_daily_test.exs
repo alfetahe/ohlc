@@ -28,6 +28,8 @@ defmodule OHLCStaticDailyTest do
     copy_candle = Enum.at(data[:candles], 1)
     last_candle = Enum.at(data[:candles], 2)
 
+    IO.inspect(data)
+
     assert length(data[:candles]) === 3 and
              first_candle[:type] === :bearish and
              first_candle[:open] === 125.54 and
@@ -35,17 +37,17 @@ defmodule OHLCStaticDailyTest do
              first_candle[:low] === 19.3 and
              first_candle[:close] === 19.3 and
              first_candle[:volume] === 37.83 and
-             first_candle[:stime] === 1_616_630_400 and
-             first_candle[:etime] === 1_616_716_800 and
+             first_candle[:stime] === 1616630400 and
+             first_candle[:etime] === 1616716799 and
              first_candle[:trades] === 5 and
              copy_candle[:type] === nil and
              copy_candle[:open] === 19.3 and
-             copy_candle[:high] === 0 and
-             copy_candle[:low] === 0 and
+             copy_candle[:high] === 0.0 and
+             copy_candle[:low] === 0.0 and
              copy_candle[:close] === 19.3 and
-             copy_candle[:volume] === 0 and
-             copy_candle[:stime] === 1_616_716_800 and
-             copy_candle[:etime] === 1_616_803_200 and
+             copy_candle[:volume] === 0.0 and
+             copy_candle[:stime] === 1616716799 and
+             copy_candle[:etime] === 1616716800 and
              copy_candle[:trades] === 0 and
              last_candle[:type] === :bullish and
              last_candle[:open] === 0.1 and
@@ -53,8 +55,8 @@ defmodule OHLCStaticDailyTest do
              last_candle[:low] === 0.1 and
              last_candle[:close] === 0.3 and
              last_candle[:volume] === 18.4 and
-             last_candle[:stime] === 1_616_803_200 and
-             last_candle[:etime] === 1_616_889_600 and
+             last_candle[:stime] === 1616803200 and
+             last_candle[:etime] === 1616889599 and
              last_candle[:trades] === 4
   end
 
