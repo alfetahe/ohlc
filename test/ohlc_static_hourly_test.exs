@@ -5,6 +5,31 @@ defmodule OHLCStaticHourlyTest do
 
   doctest OHLC
 
+  test "Candle merging" do
+    {:ok, hour_candles} = create_candles(single_hourly_candle_1(), :day)
+    {:ok, minute_candles} = create_candles(single_hourly_candle_2(), :hour)
+
+    {:ok, merged_candle} =
+      merge_candles(
+        hour_candles[:candles]
+        |> Enum.at(0),
+        minute_candles[:candles] |> Enum.at(0)
+      )
+
+    assert merged_candle === %{
+             close: 98.4,
+             etime: 1_616_457_599,
+             high: 2222.0,
+             low: 11.0,
+             open: 125.54,
+             processed: true,
+             stime: 1_616_371_200,
+             trades: 18,
+             type: :bearish,
+             volume: 168.872
+           }
+  end
+
   test "Candle timeframe converting" do
     trades = single_hourly_candle_1() ++ single_hourly_candle_2()
 

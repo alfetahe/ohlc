@@ -216,6 +216,15 @@ defmodule OHLC do
     {:ok, candles}
   end
 
+  @doc """
+  Merges candle into another candle.
+
+  Parameters:
+  - `main_candle` - Candle which will be merged into.
+  - `merge_candle` - Candle which will be merged. It is important to
+  have etime less than first candle. Meaning both candles should stay
+  in the same timeframe.
+  """
   @spec merge_candles(candle(), candle()) :: {:ok, candle()} | {:error, binary()}
   def merge_candles(main_candle, merge_candle) do
     if main_candle[:etime] > merge_candle[:etime] do
@@ -275,10 +284,10 @@ defmodule OHLC do
     main_candle
     |> Map.update(:volume, 0, fn vol -> (vol + merge_candle[:volume]) |> Float.round(4) end)
     |> Map.update(:trades, 0, fn trades -> trades + merge_candle[:trades] end)
-    |> Map.update(:trades, 0, fn high ->
+    |> Map.update(:high, 0, fn high ->
       if high < merge_candle[:high], do: merge_candle[:high], else: high
     end)
-    |> Map.update(:trades, 0, fn low ->
+    |> Map.update(:low, 0, fn low ->
       if low > merge_candle[:low], do: merge_candle[:low], else: low
     end)
     |> Map.put(:close, merge_candle[:close])
