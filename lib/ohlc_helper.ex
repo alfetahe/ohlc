@@ -203,7 +203,7 @@ defmodule OHLCHelper do
 
     cond do
       opts[:type] === :down ->
-        DateTime.add(time_struct, -(get_timeframes()[:day] * (day_of_week - 1)), :second)
+        DateTime.add(time_struct, -(get_timeframes()[:day] * 7), :second)
         |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
 
       opts[:type] === :up or opts[:type] === nil ->
@@ -211,7 +211,6 @@ defmodule OHLCHelper do
 
       opts[:type] === :jump ->
         DateTime.add(time_struct, timeframe_secs, :second)
-        |> DateTime.add(-(get_timeframes()[:day] * (day_of_week - 1)), :second)
         |> Map.put(:second, 00) |> Map.put(:minute, 00) |> Map.put(:hour, 00)
     end
     |> set_worked_time(unfinished_time_struct)
@@ -220,7 +219,8 @@ defmodule OHLCHelper do
   defp set_worked_time(worked_timestruct, def_timestruct) do
     %{
       def_timestruct
-      | day: worked_timestruct.day,
+      | month: worked_timestruct.month,
+        day: worked_timestruct.day,
         hour: worked_timestruct.hour,
         minute: worked_timestruct.minute,
         second: worked_timestruct.second
