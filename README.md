@@ -20,7 +20,7 @@ list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ohlc, "~> 1.0"}
+    {:ohlc, "~> 1.1"}
   ]
 end
 ```
@@ -50,7 +50,7 @@ end
   candles: [
     %{
       close: 12.0,
-      etime: 1616439660,
+      etime: 1616439659,
       high: 12.0,
       low: 12.0,
       open: 12.0,
@@ -62,7 +62,7 @@ end
     },
     %{
       close: 12.56,
-      etime: 1616440620,
+      etime: 1616440619,
       high: 12.56,
       low: 12.56,
       open: 12.56,
@@ -74,7 +74,7 @@ end
     },
     %{
       close: 18.9,
-      etime: 1616440740,
+      etime: 1616440739,
       high: 18.9,
       low: 18.9,
       open: 18.9,
@@ -86,7 +86,7 @@ end
     },
     %{
       close: 11.0,
-      etime: 1616440800,
+      etime: 1616440799,
       high: 11.0,
       low: 11.0,
       open: 11.0,
