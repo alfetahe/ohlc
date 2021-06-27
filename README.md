@@ -30,13 +30,15 @@ end
 defmodule Example do
   def calculate_ohlc() do
     trades = [
-      [price: 12, volume: 22, time: 1616439602],
-      [price: 12.56, volume: 18.3, time: 1616440572],
-      [price: 18.9, volume: 12, time: 1616440692],
-      [price: 11, volume: 43, time: 1616440759]
+      [price: 12.21, volume: 0.98, time: 1616439921],
+      [price: 12.54, volume: 12.1, time: 1616439931],
+      [price: 12.56, volume: 18.3, time: 1616439952],
+      [price: 18.9, volume: 12, time: 1616440004],
+      [price: 11, volume: 43.1, time: 1616440025],
+      [price: 18.322, volume: 43.1, time: 1616440028]
     ]
 
-    case OHLC.create_candles(trades, :minute, [validate_trades: true]) do
+    case OHLC.create_candles(trades, :minute) do
       {:ok, data} -> IO.inspect data
       {:error, msg} -> IO.puts msg
     end
@@ -49,52 +51,40 @@ end
 %{
   candles: [
     %{
-      close: 12.0,
-      etime: 1616439659,
-      high: 12.0,
-      low: 12.0,
-      open: 12.0,
-      processed: true,
-      stime: 1616439600,
-      trades: 1,
-      type: :bearish,
-      volume: 22.0
-    },
-    %{
       close: 12.56,
-      etime: 1616440619,
+      etime: 1616439959,
       high: 12.56,
-      low: 12.56,
-      open: 12.56,
+      low: 12.21,
+      open: 12.21,
       processed: true,
-      stime: 1616440560,
-      trades: 1,
-      type: :bearish,
-      volume: 18.3
+      stime: 1616439900,
+      trades: 3,
+      type: :bullish,
+      volume: 31.38
     },
     %{
       close: 18.9,
-      etime: 1616440739,
+      etime: 1616440019,
       high: 18.9,
       low: 18.9,
       open: 18.9,
       processed: true,
-      stime: 1616440680,
+      stime: 1616439960,
       trades: 1,
       type: :bearish,
       volume: 12.0
     },
     %{
-      close: 11.0,
-      etime: 1616440799,
-      high: 11.0,
+      close: 18.322,
+      etime: 1616440079,
+      high: 18.322,
       low: 11.0,
       open: 11.0,
       processed: true,
-      stime: 1616440740,
-      trades: 1,
-      type: :bearish,
-      volume: 43.0
+      stime: 1616440020,
+      trades: 2,
+      type: :bullish,
+      volume: 86.2
     }
   ],
   pair: nil,

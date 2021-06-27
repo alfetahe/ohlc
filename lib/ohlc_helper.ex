@@ -15,18 +15,37 @@ defmodule OHLCHelper do
 
   @doc """
   Generates and returns empty candle.
+
+  If provided with timeframe stime and etime will be
+  generated based on current time.
   """
-  @spec generate_empty_candle() :: OHLC.candle()
-  def generate_empty_candle() do
+  @spec generate_empty_candle(OHLC.timeframe() | nil) :: OHLC.candle()
+  def generate_empty_candle(timeframe \\ nil) do
+    {stime, etime} =
+      case timeframe do
+        nil ->
+          {0, 0}
+
+        _ ->
+          curr_timestamp =
+            DateTime.utc_now()
+            |> DateTime.to_unix()
+
+          {
+            get_time_rounded(curr_timestamp, timeframe, type: :down),
+            get_time_rounded(curr_timestamp, timeframe, type: :up)
+          }
+      end
+
     %{
-      :etime => 0,
-      :stime => 0,
       :open => 0.0,
       :high => 0.0,
       :low => 0.0,
       :close => 0.0,
       :volume => 0.0,
       :trades => 0,
+      :stime => stime,
+      :etime => etime,
       :type => nil,
       :processed => false
     }

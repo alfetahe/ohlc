@@ -13,44 +13,32 @@ defmodule OHLCDynamicTest do
 
   # Minute Candles
 
-  test "Test minute 1 candle" do
-    assert(test_single_candle(:minute, 172.2, 368, 94.3, 0, 1))
-  end
+  test "asdasd" do
+    trades = [
+      [
+        price: "27638.00000",
+        volume: "0.00178301",
+        time: "1624803017.125068",
+        side: "b"
+      ]
+    ]
 
-  test "Test minute 1000 candles" do
-    Enum.all?(0..1000, &test_single_candle(:minute, 83 + &1, 156 + &1, 2 + &1, &1, 1)) |> assert()
-  end
+    last_candle = %{
+      "close" => 27723.9,
+      "etime" => 1_624_802_039,
+      "high" => 27741.1,
+      "low" => 27708.0,
+      "open" => 27710.0,
+      "processed" => true,
+      "stime" => 1_624_801_980,
+      "trades" => 10,
+      "type" => "bullish",
+      "volume" => 0.8677
+    }
 
-  # Hourly candles
+    data = OHLC.create_candles(trades, :minute, previous_candle: last_candle)
 
-  test "Test hourly 1 candle" do
-    assert(test_single_candle(:hour, 1533.45, 4893.232, 1.6, 0))
-  end
-
-  test "Test hourly 10 candles" do
-    Enum.all?(0..10, &test_single_candle(:hour, 83.23 + &1, 384 + &1, 2.1 + &1, &1, 10))
-    |> assert()
-  end
-
-  # Daily candles
-  test "Test daily 1 candle" do
-    assert(test_single_candle(:day, 88.2, 112, 4.2, 0, 100))
-  end
-
-  test "Test daily 3 candles" do
-    Enum.all?(0..3, &test_single_candle(:day, 142.2 + &1, 369.23 + &1, 0.3 + &1, &1, 100))
-    |> assert()
-  end
-
-  # Weekly candles
-
-  test "Test weekly 1 candle" do
-    assert(test_single_candle(:week, 0.23, 0.42, 156.65, 0, 100))
-  end
-
-  test "Test weekly 2 candles" do
-    Enum.all?(0..2, &test_single_candle(:week, 0.14 + &1, 0.68 + &1, 467 + &1, &1, 100))
-    |> assert()
+    5 + 2
   end
 
   @doc """
