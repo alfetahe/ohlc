@@ -287,7 +287,7 @@ defmodule OHLC do
     |> Map.update(:type, nil, fn _type ->
       get_candle_type(main_candle[:open], merge_candle[:close])
     end)
-    |> Map.update(:open, fn open -> if open === 0, do: merge_candle[:open], else: open end)
+    |> Map.update(:open, 0, fn open -> if open === 0, do: merge_candle[:open], else: open end)
   end
 
   defp construct_candles(candles, trades, timeframe, opts) do
