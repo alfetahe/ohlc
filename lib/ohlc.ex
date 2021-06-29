@@ -209,6 +209,9 @@ defmodule OHLC do
   @doc """
   Merges candle into another candle.
 
+  If main candles `:stime` is 0 then fallback
+  to the merge_candles `:stime`.
+
   Parameters:
   - `main_candle` - Candle which will be merged into.
   - `merge_candle` - Candle which will be merged. It is important to
@@ -284,6 +287,7 @@ defmodule OHLC do
     |> Map.update(:type, nil, fn _type ->
       get_candle_type(main_candle[:open], merge_candle[:close])
     end)
+    |> Map.update(:open, fn open -> if open === 0, do: merge_candle[:open], else: open end)
   end
 
   defp construct_candles(candles, trades, timeframe, opts) do

@@ -38,11 +38,11 @@ defmodule OHLCHelper do
       end
 
     %{
-      :open => 0.0,
-      :high => 0.0,
-      :low => 0.0,
-      :close => 0.0,
-      :volume => 0.0,
+      :open => 0,
+      :high => 0,
+      :low => 0,
+      :close => 0,
+      :volume => 0,
       :trades => 0,
       :stime => stime,
       :etime => etime,
