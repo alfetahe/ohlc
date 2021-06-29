@@ -210,7 +210,7 @@ defmodule OHLC do
   Merges candle into another candle.
 
   If main candles `:stime` is 0 then fallback
-  to the merge_candles `:stime`.
+  to the merge_child `:stime`.
 
   Parameters:
   - `main_candle` - Candle which will be merged into.
@@ -218,8 +218,8 @@ defmodule OHLC do
   have etime less than first candle. Meaning both candles should stay
   in the same timeframe.
   """
-  @spec merge_candles(candle(), candle()) :: {:ok, candle()} | {:error, binary()}
-  def merge_candles(main_candle, merge_candle) do
+  @spec merge_child(candle(), candle()) :: {:ok, candle()} | {:error, binary()}
+  def merge_child(main_candle, merge_candle) do
     if main_candle[:etime] > merge_candle[:etime] do
       candle = merge_single_candle(main_candle, merge_candle)
 
