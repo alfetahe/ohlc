@@ -114,14 +114,14 @@ defmodule OHLC do
   Single candle generated.
   """
   @type candle :: %{
-          required(:open) => number(),
-          required(:high) => number(),
-          required(:low) => number(),
-          required(:close) => number(),
-          required(:volume) => number(),
-          required(:trades) => number(),
-          required(:stime) => number(),
-          required(:etime) => number(),
+          required(:open) => float(),
+          required(:high) => float(),
+          required(:low) => float(),
+          required(:close) => float(),
+          required(:volume) => float(),
+          required(:trades) => integer(),
+          required(:stime) => integer() | float(),
+          required(:etime) => integer() | float(),
           required(:type) => :bullish | :bearish | nil,
           optional(:processed) => boolean()
         }
@@ -275,19 +275,19 @@ defmodule OHLC do
 
   defp merge_single_candle(main_candle, merge_candle) do
     main_candle
-    |> Map.update(:volume, 0, fn vol -> (vol + merge_candle[:volume]) |> Float.round(4) end)
+    |> Map.update(:volume, 0.0, fn vol -> (vol + merge_candle[:volume]) |> Float.round(4) end)
     |> Map.update(:trades, 0, fn trades -> trades + merge_candle[:trades] end)
-    |> Map.update(:high, 0, fn high ->
+    |> Map.update(:high, 0.0, fn high ->
       if high < merge_candle[:high], do: merge_candle[:high], else: high
     end)
-    |> Map.update(:low, 0, fn low ->
+    |> Map.update(:low, 0.0, fn low ->
       if low < merge_candle[:low] and low !== 0, do: low, else: merge_candle[:low]
     end)
     |> Map.put(:close, merge_candle[:close])
     |> Map.update(:type, nil, fn _type ->
       get_candle_type(main_candle[:open], merge_candle[:close])
     end)
-    |> Map.update(:open, 0, fn open -> if open === 0, do: merge_candle[:open], else: open end)
+    |> Map.update(:open, 0.0, fn open -> if open === 0.0, do: merge_candle[:open], else: open end)
   end
 
   defp construct_candles(candles, trades, timeframe, opts) do
