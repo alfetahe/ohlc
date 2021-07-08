@@ -1,18 +1,5 @@
 
-# Changelog for OHLC v1.1.1
+# Changelog for OHLC v1.1.2
 
-### Updated empty candle generation func.
+OHLC empty candle types from numbers to floats.
 
-
-# Changelog for OHLC v1.1.0
-
-### Introduced new functions:
-- convert_timeframe/2
-- merge_candles/2
-
-### Reveres the candles list output.
-
-### Bug fixes.
-- Timeframe fixes
-
-### Added new tests.
