@@ -4,7 +4,7 @@ defmodule OHLC.MixProject do
   def project do
     [
       app: :ohlc,
-      version: "1.1.1",
+      version: "1.1.2",
       elixir: "~> 1.0",
       description: description(),
       package: package(),
