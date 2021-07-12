@@ -1,5 +1,5 @@
 
-# Changelog for OHLC v1.1.2
+# Changelog for OHLC v1.1.3
 
-OHLC empty candle types from numbers to floats.
+Fixed candle merge low price settings and tests.
 

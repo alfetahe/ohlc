@@ -281,7 +281,7 @@ defmodule OHLC do
       if high < merge_candle[:high], do: merge_candle[:high], else: high
     end)
     |> Map.update(:low, 0.0, fn low ->
-      if low < merge_candle[:low] and low !== 0, do: low, else: merge_candle[:low]
+      if low < merge_candle[:low] and low !== 0.0, do: low, else: merge_candle[:low]
     end)
     |> Map.put(:close, merge_candle[:close])
     |> Map.update(:type, nil, fn _type ->

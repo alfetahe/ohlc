@@ -10,7 +10,7 @@ defmodule OHLCStaticHourlyTest do
     {:ok, minute_candles} = create_candles(single_hourly_candle_2(), :hour)
 
     {:ok, merged_candle} =
-      merge_candles(
+      merge_child(
         hour_candles[:candles]
         |> Enum.at(0),
         minute_candles[:candles] |> Enum.at(0)

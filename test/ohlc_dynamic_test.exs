@@ -11,36 +11,6 @@ defmodule OHLCDynamicTest do
   # 2021-22-03 00:00:00 UTC +0
   @base_timestamp 1_616_371_200
 
-  # Minute Candles
-
-  test "asdasd" do
-    trades = [
-      [
-        price: "27638.00000",
-        volume: "0.00178301",
-        time: "1624803017.125068",
-        side: "b"
-      ]
-    ]
-
-    last_candle = %{
-      "close" => 27723.9,
-      "etime" => 1_624_802_039,
-      "high" => 27741.1,
-      "low" => 27708.0,
-      "open" => 27710.0,
-      "processed" => true,
-      "stime" => 1_624_801_980,
-      "trades" => 10,
-      "type" => "bullish",
-      "volume" => 0.8677
-    }
-
-    data = OHLC.create_candles(trades, :minute, previous_candle: last_candle)
-
-    5 + 2
-  end
-
   @doc """
   Creates dynamically one candle per timeframe and validates the candle returning
   true if the dynamically created candle is valid and false if not valid.
