@@ -117,8 +117,20 @@ defmodule OHLCHelper do
 
   @doc """
   Generates trades from provided arguments.
+
+  Parameters:
+  - `timeframe` - Timeframe used for rounding the timestamp.
+  Available values are: `:minute`, `:hour`, `:day`, `:week`
+  - `min_price` - The minimum price on the generated trades
+  - `max_price` - The maximum price on the generated trades
+  - `volume` - The volume each trade has
+  - `volume` - The volume each trade has
+  - `volume` - The volume each trade has
+  - `timeframe_multiplier` - If you'd like to generate less trades per candle then you can increase the size of
+  the timeframe_divider parameter(1-100) otherwise leave empty.
+  - `timeframe_divider` - Is used for generating multiple candles of the same timeframe.
   """
-  @spec gen_trades(atom(), number(), number(), number(), integer(), integer()) :: list()
+  @spec gen_trades(OHLC.timeframe(), number(), number(), number(), integer(), integer()) :: list()
   def gen_trades(
          timeframe,
          min_price,

@@ -1,5 +1,6 @@
 
-# Changelog for OHLC v1.1.3
+# Changelog for OHLC v1.1.4
 
-Fixed candle merge low price settings and tests.
+New function gen_trades/5
+
 
