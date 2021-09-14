@@ -5,6 +5,9 @@ defmodule OHLCHelper do
 
   @timeframes [minute: 60, hour: 3600, day: 86_400, week: 604_800]
 
+  # 2021-22-03 00:00:00 UTC +0
+  @base_timestamp 1_616_371_200
+
   @doc """
   Returns all available timeframes in seconds.
   """
@@ -110,6 +113,53 @@ defmodule OHLCHelper do
       :struct -> rounded_time
       _ -> DateTime.to_unix(rounded_time)
     end
+  end
+
+  @doc """
+  Generates trades from provided arguments.
+  """
+  @spec gen_trades(atom(), number(), number(), number(), integer(), integer()) :: list()
+  def gen_trades(
+         timeframe,
+         min_price,
+         max_price,
+         volume,
+         timeframe_multiplier \\ 1,
+         timeframe_divider \\ 1
+       ) do
+
+    timeframe_secs = @timeframes[timeframe]
+
+    price_range = (max_price - min_price) |> Float.round(4)
+
+    timestamp_multipled = @base_timestamp + timeframe_secs * timeframe_multiplier
+
+    items_to_loop = ((timeframe_secs - 1) / timeframe_divider) |> trunc()
+
+    Enum.map(1..items_to_loop, fn numb ->
+      numb_multiplied = numb * timeframe_divider
+
+      price =
+        cond do
+          numb === 1 ->
+            max_price
+
+          numb === items_to_loop ->
+            min_price
+
+          true ->
+            (price_range / numb_multiplied + min_price) |> Float.round(4)
+        end
+
+      price = (is_float(price) && Float.round(price, 4)) || price
+      volume = (is_float(volume) && Float.round(volume, 4)) || volume
+
+      [
+        price: price,
+        volume: volume,
+        time: timestamp_multipled + numb_multiplied
+      ]
+    end)
   end
 
   @doc """

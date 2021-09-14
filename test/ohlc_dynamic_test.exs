@@ -6,11 +6,6 @@ defmodule OHLCDynamicTest do
 
   doctest OHLC
 
-  @timeframes [{:minute, 60}, {:hour, 3600}, {:day, 86_400}, {:week, 604_800}]
-
-  # 2021-22-03 00:00:00 UTC +0
-  @base_timestamp 1_616_371_200
-
   @doc """
   Creates dynamically one candle per timeframe and validates the candle returning
   true if the dynamically created candle is valid and false if not valid.
@@ -41,8 +36,8 @@ defmodule OHLCDynamicTest do
     volume = (is_float(volume) && Float.round(volume, 4)) || volume / 1
 
     trades =
-      generate_single_candle_trades(
-        @timeframes[timeframe],
+      gen_trades(
+        timeframe,
         min_price,
         max_price,
         volume,
@@ -67,45 +62,5 @@ defmodule OHLCDynamicTest do
         get_time_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp) and
       Enum.at(data[:candles], 0)[:type] ===
         get_candle_type(Enum.at(data[:candles], 0)[:open], Enum.at(data[:candles], 0)[:close])
-  end
-
-  defp generate_single_candle_trades(
-         timeframe,
-         min_price,
-         max_price,
-         volume,
-         timeframe_multiplier,
-         timeframe_divider
-       ) do
-    price_range = (max_price - min_price) |> Float.round(4)
-
-    timestamp_multipled = @base_timestamp + timeframe * timeframe_multiplier
-
-    items_to_loop = ((timeframe - 1) / timeframe_divider) |> trunc()
-
-    Enum.map(1..items_to_loop, fn numb ->
-      numb_multiplied = numb * timeframe_divider
-
-      price =
-        cond do
-          numb === 1 ->
-            max_price
-
-          numb === items_to_loop ->
-            min_price
-
-          true ->
-            (price_range / numb_multiplied + min_price) |> Float.round(4)
-        end
-
-      price = (is_float(price) && Float.round(price, 4)) || price
-      volume = (is_float(volume) && Float.round(volume, 4)) || volume
-
-      [
-        price: price,
-        volume: volume,
-        time: timestamp_multipled + numb_multiplied
-      ]
-    end)
   end
 end
