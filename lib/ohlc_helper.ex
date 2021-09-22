@@ -57,7 +57,7 @@ defmodule OHLCHelper do
   @doc """
   Helper function for formatting the value to float.
   """
-  @spec format_to_float(any) :: float | {:error, binary()}
+  @spec format_to_float(any) :: float | false
   def format_to_float(value) when is_binary(value) do
     {float, _} = value |> String.replace(",", ".") |> String.trim() |> Float.parse()
     float
@@ -65,7 +65,7 @@ defmodule OHLCHelper do
 
   def format_to_float(value) when is_number(value) or is_integer(value), do: value / 1
   def format_to_float(value) when is_float(value), do: value
-  def format_to_float(_), do: {:error, :invalid_type}
+  def format_to_float(_), do: false
 
   @doc """
   Gets the rounded timestamp based on the timeframe.
@@ -81,7 +81,7 @@ defmodule OHLCHelper do
     - `{:type, :down | :up | :jump}` - Timestamp will be rounded
     up, down or jump to the next time cycle. Default is `:up`.
   """
-  @spec get_time_rounded(number(), OHLC.timeframe(), list() | nil) :: number() | DateTime
+  @spec get_time_rounded(number(), OHLC.timeframe(), list() | nil) :: number() | %DateTime{}
   def get_time_rounded(timestamp, timeframe, opts \\ []) do
     timestamp = timestamp |> format_to_float() |> round()
 
@@ -208,7 +208,7 @@ defmodule OHLCHelper do
   Validates the data used for generating the OHLC candles.
   Accepts lists of candles, trades or both.
   """
-  @spec validate_data(OHLC.candles() | nil, OHLC.trades() | nil) :: :ok | {:error, binary()}
+  @spec validate_data(OHLC.candles() | nil, OHLC.trades() | nil) :: :ok | {:error, atom()}
   def validate_data(candles \\ [], trades \\ []) do
     case validate_candles(candles) do
       {:error, candles_error_msg} ->
@@ -377,10 +377,10 @@ defmodule OHLCHelper do
         {:error, :invalid_price}
 
       !volume_validation ->
-        {:error, :invalid_price}
+        {:error, :invalid_volume}
 
       !time_validation ->
-        {:error, :invalid_price}
+        {:error, :invalid_time}
 
       !etime_greater ->
         {:error, :invalid_candle_order}
