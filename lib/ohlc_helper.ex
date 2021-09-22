@@ -65,7 +65,7 @@ defmodule OHLCHelper do
 
   def format_to_float(value) when is_number(value) or is_integer(value), do: value / 1
   def format_to_float(value) when is_float(value), do: value
-  def format_to_float(value), do: {:error, "Data not formattable to float: #{value}"}
+  def format_to_float(_), do: {:error, :invalid_type}
 
   @doc """
   Gets the rounded timestamp based on the timeframe.
@@ -132,14 +132,13 @@ defmodule OHLCHelper do
   """
   @spec gen_trades(OHLC.timeframe(), number(), number(), number(), integer(), integer()) :: list()
   def gen_trades(
-         timeframe,
-         min_price,
-         max_price,
-         volume,
-         timeframe_multiplier \\ 1,
-         timeframe_divider \\ 1
-       ) do
-
+        timeframe,
+        min_price,
+        max_price,
+        volume,
+        timeframe_multiplier \\ 1,
+        timeframe_divider \\ 1
+      ) do
     timeframe_secs = @timeframes[timeframe]
 
     price_range = (max_price - min_price) |> Float.round(4)
@@ -332,7 +331,7 @@ defmodule OHLCHelper do
     if data_validated do
       :ok
     else
-      {:error, "Candles must be type of map containing all the neccessary keys."}
+      {:error, :candle_invalid}
     end
   end
 
@@ -353,7 +352,7 @@ defmodule OHLCHelper do
         end
 
       false ->
-        {:error, "Trades list does not contain all necessary keys"}
+        {:error, :invalid_trades}
     end
   end
 
@@ -375,17 +374,16 @@ defmodule OHLCHelper do
 
     cond do
       !price_validation ->
-        {:error, "Price is not float: #{format_to_float(trade[:price])}"}
+        {:error, :invalid_price}
 
       !volume_validation ->
-        {:error, "Volume is not float: #{format_to_float(trade[:volume])}"}
+        {:error, :invalid_price}
 
       !time_validation ->
-        {:error, "Time is not float: #{format_to_float(trade[:volume])}"}
+        {:error, :invalid_price}
 
       !etime_greater ->
-        {:error,
-         "Current trade time(#{format_to_float(trade[:time])}) is not bigger or equal to the previous trade time(#{format_to_float(prev_etime)})"}
+        {:error, :invalid_candle_order}
 
       true ->
         :ok

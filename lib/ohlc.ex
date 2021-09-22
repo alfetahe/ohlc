@@ -220,12 +220,12 @@ defmodule OHLC do
   """
   @spec merge_child(candle(), candle()) :: {:ok, candle()} | {:error, binary()}
   def merge_child(main_candle, merge_candle) do
-    if main_candle[:etime] > merge_candle[:etime] do
+    if main_candle[:etime] >= merge_candle[:etime] do
       candle = merge_single_candle(main_candle, merge_candle)
 
       {:ok, candle}
     else
-      {:error, "Second candle's etime cannot be higher then first."}
+      {:error, :invalid_candle_order}
     end
   end
 
