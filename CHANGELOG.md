@@ -1,9 +1,7 @@
 
-# Changelog for OHLC v1.1.5
+# Changelog for OHLC v1.1.6
 
-Candle merge etime error fix.
-String error reasons to atoms.
-Fixed spec types.
+Typespec fix.
 
 
 

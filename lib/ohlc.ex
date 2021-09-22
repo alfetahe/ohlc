@@ -173,7 +173,7 @@ defmodule OHLC do
              :timeframe => timeframe(),
              :candles => candles()
            }}
-          | {:error, binary()}
+          | {:error, atom()}
   def create_candles(trades, timeframe, opts \\ []) do
     candles =
       cond do
@@ -218,7 +218,7 @@ defmodule OHLC do
   have etime less than first candle. Meaning both candles should stay
   in the same timeframe.
   """
-  @spec merge_child(candle(), candle()) :: {:ok, candle()} | {:error, binary()}
+  @spec merge_child(candle(), candle()) :: {:ok, candle()} | {:error, atom()}
   def merge_child(main_candle, merge_candle) do
     if main_candle[:etime] >= merge_candle[:etime] do
       candle = merge_single_candle(main_candle, merge_candle)
