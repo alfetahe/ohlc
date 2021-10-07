@@ -279,23 +279,23 @@ defmodule OHLCHelper do
 
   defp time_week_worker(time_struct, unfinished_time_struct, opts) do
     timeframe_secs = get_timeframes()[:week]
-    day_of_week = DateTime.to_date(time_struct) |> Date.day_of_week()
-    days_to_calc = 7 - day_of_week
-
-    time_struct = DateTime.add(time_struct, get_timeframes()[:day] * days_to_calc, :second)
 
     cond do
       opts[:type] === :down ->
-        DateTime.add(time_struct, -(get_timeframes()[:day] * 7), :second)
+        Date.beginning_of_week(time_struct)
         |> Map.put(:second, 00)
         |> Map.put(:minute, 00)
         |> Map.put(:hour, 00)
 
       opts[:type] === :up or opts[:type] === nil ->
-        Map.put(time_struct, :second, 59) |> Map.put(:minute, 59) |> Map.put(:hour, 23)
+        Date.end_of_week(time_struct)
+        |> Map.put(:second, 59)
+        |> Map.put(:minute, 59)
+        |> Map.put(:hour, 23)
 
       opts[:type] === :jump ->
         DateTime.add(time_struct, timeframe_secs, :second)
+        |> Date.beginning_of_week()
         |> Map.put(:second, 00)
         |> Map.put(:minute, 00)
         |> Map.put(:hour, 00)

@@ -11,12 +11,10 @@ defmodule OHLCStaticDailyTest do
 
     {:ok, data} = create_candles(trades, :day)
 
-    assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0)[:open] === Enum.at(trades, 0)[:price] and
-        Enum.at(data[:candles], 0)[:close] === Enum.at(trades, -1)[:price] and
-        Enum.at(data[:candles], 0)[:volume] === trades_total_volume(trades)
-    )
+    assert length(data[:candles]) === 1
+    assert Enum.at(data[:candles], 0)[:open] === Enum.at(trades, 0)[:price]
+    assert Enum.at(data[:candles], 0)[:close] === Enum.at(trades, -1)[:price]
+    assert Enum.at(data[:candles], 0)[:volume] === trades_total_volume(trades)
   end
 
   test "Test 2 daily candles with forward fill" do
@@ -28,34 +26,34 @@ defmodule OHLCStaticDailyTest do
     copy_candle = Enum.at(data[:candles], 1)
     last_candle = Enum.at(data[:candles], 2)
 
-    assert length(data[:candles]) === 3 and
-             first_candle[:type] === :bearish and
-             first_candle[:open] === 125.54 and
-             first_candle[:high] === 126.877 and
-             first_candle[:low] === 19.3 and
-             first_candle[:close] === 19.3 and
-             first_candle[:volume] === 37.83 and
-             first_candle[:stime] === 1_616_630_400 and
-             first_candle[:etime] === 1_616_716_799 and
-             first_candle[:trades] === 5 and
-             copy_candle[:type] === nil and
-             copy_candle[:open] === 19.3 and
-             copy_candle[:high] === 0.0 and
-             copy_candle[:low] === 0.0 and
-             copy_candle[:close] === 19.3 and
-             copy_candle[:volume] === 0.0 and
-             copy_candle[:stime] === 1_616_716_799 and
-             copy_candle[:etime] === 1_616_716_800 and
-             copy_candle[:trades] === 0 and
-             last_candle[:type] === :bullish and
-             last_candle[:open] === 0.1 and
-             last_candle[:high] === 0.43 and
-             last_candle[:low] === 0.1 and
-             last_candle[:close] === 0.3 and
-             last_candle[:volume] === 18.4 and
-             last_candle[:stime] === 1_616_803_200 and
-             last_candle[:etime] === 1_616_889_599 and
-             last_candle[:trades] === 4
+    assert length(data[:candles]) === 3
+    assert first_candle[:type] === :bearish
+    assert first_candle[:open] === 125.54
+    assert first_candle[:high] === 126.877
+    assert first_candle[:low] === 19.3
+    assert first_candle[:close] === 19.3
+    assert first_candle[:volume] === 37.83
+    assert first_candle[:stime] === 1_616_630_400
+    assert first_candle[:etime] === 1_616_716_799
+    assert first_candle[:trades] === 5
+    assert copy_candle[:type] === nil
+    assert copy_candle[:open] === 19.3
+    assert copy_candle[:high] === 0.0
+    assert copy_candle[:low] === 0.0
+    assert copy_candle[:close] === 19.3
+    assert copy_candle[:volume] === 0.0
+    assert copy_candle[:stime] === 1_616_716_799
+    assert copy_candle[:etime] === 1_616_716_800
+    assert copy_candle[:trades] === 0
+    assert last_candle[:type] === :bullish
+    assert last_candle[:open] === 0.1
+    assert last_candle[:high] === 0.43
+    assert last_candle[:low] === 0.1
+    assert last_candle[:close] === 0.3
+    assert last_candle[:volume] === 18.4
+    assert last_candle[:stime] === 1_616_803_200
+    assert last_candle[:etime] === 1_616_889_599
+    assert last_candle[:trades] === 4
   end
 
   defp single_daily_candle_1 do

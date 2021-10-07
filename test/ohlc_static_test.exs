@@ -9,7 +9,7 @@ defmodule OHLCStaticTest do
   test "Candle forward fill" do
     {:ok, data} = create_candles(forward_filling_data_1(), :hour, forward_fill: true)
 
-    assert(length(data[:candles]) === 12)
+    assert length(data[:candles]) === 12
   end
 
   test "Candle appending" do
@@ -21,15 +21,13 @@ defmodule OHLCStaticTest do
     trades_2 = single_min_data_1()
     {:ok, data} = create_candles(trades_2, :minute, previous_candle: candle)
 
-    assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0)[:open] ===
-          Enum.at(trades_1, 0)[:price] |> format_to_float() and
-        Enum.at(data[:candles], 0)[:close] ===
-          Enum.at(trades_2, -1)[:price] |> format_to_float() and
-        Enum.at(data[:candles], 0)[:volume] ===
-          trades_total_volume(trades_1 ++ trades_2)
-    )
+    assert length(data[:candles]) === 1
+    assert Enum.at(data[:candles], 0)[:open] === Enum.at(trades_1, 0)[:price] |> format_to_float()
+
+    assert Enum.at(data[:candles], 0)[:close] ===
+             Enum.at(trades_2, -1)[:price] |> format_to_float()
+
+    assert Enum.at(data[:candles], 0)[:volume] === trades_total_volume(trades_1 ++ trades_2)
   end
 
   test "Must contain one single minute candles" do
@@ -41,15 +39,13 @@ defmodule OHLCStaticTest do
     trades_2 = single_min_data_2()
     {:ok, data} = create_candles(trades_2, :minute, previous_candle: candle)
 
-    assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0)[:open] ===
-          Enum.at(trades_1, 0)[:price] |> format_to_float() and
-        Enum.at(data[:candles], 0)[:close] ===
-          Enum.at(trades_2, -1)[:price] |> format_to_float() and
-        Enum.at(data[:candles], 0)[:volume] ===
-          trades_total_volume(trades_1 ++ trades_2)
-    )
+    assert length(data[:candles]) === 1
+    assert Enum.at(data[:candles], 0)[:open] === Enum.at(trades_1, 0)[:price] |> format_to_float()
+
+    assert Enum.at(data[:candles], 0)[:close] ===
+             Enum.at(trades_2, -1)[:price] |> format_to_float()
+
+    assert Enum.at(data[:candles], 0)[:volume] === trades_total_volume(trades_1 ++ trades_2)
   end
 
   # Error tests

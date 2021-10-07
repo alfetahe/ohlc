@@ -46,25 +46,25 @@ defmodule OHLCStaticHourlyTest do
     first_candle = Enum.at(data[:candles], 0)
     last_candle = Enum.at(data[:candles], 1)
 
-    assert length(data[:candles]) === 2 and
-             first_candle[:type] === :bearish and
-             first_candle[:open] === 125.54 and
-             first_candle[:high] === 129.32 and
-             first_candle[:low] === 19.3 and
-             first_candle[:close] === 119.4 and
-             first_candle[:volume] === 41.142 and
-             first_candle[:stime] === 1_616_436_000 and
-             first_candle[:etime] === 1_616_439_599 and
-             first_candle[:trades] === 9 and
-             last_candle[:type] === :bullish and
-             last_candle[:open] === 12.0 and
-             last_candle[:high] === 2222.0 and
-             last_candle[:low] === 11.0 and
-             last_candle[:close] === 98.4 and
-             last_candle[:volume] === 127.73 and
-             last_candle[:stime] === 1_616_439_600 and
-             last_candle[:etime] === 1_616_443_199 and
-             last_candle[:trades] === 9
+    assert length(data[:candles]) === 2
+    assert first_candle[:type] === :bearish
+    assert first_candle[:open] === 125.54
+    assert first_candle[:high] === 129.32
+    assert first_candle[:low] === 19.3
+    assert first_candle[:close] === 119.4
+    assert first_candle[:volume] === 41.142
+    assert first_candle[:stime] === 1_616_436_000
+    assert first_candle[:etime] === 1_616_439_599
+    assert first_candle[:trades] === 9
+    assert last_candle[:type] === :bullish
+    assert last_candle[:open] === 12.0
+    assert last_candle[:high] === 2222.0
+    assert last_candle[:low] === 11.0
+    assert last_candle[:close] === 98.4
+    assert last_candle[:volume] === 127.73
+    assert last_candle[:stime] === 1_616_439_600
+    assert last_candle[:etime] === 1_616_443_199
+    assert last_candle[:trades] === 9
   end
 
   defp single_hourly_candle_1 do

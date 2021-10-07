@@ -11,12 +11,10 @@ defmodule OHLCStaticWeeklyTest do
 
     {:ok, data} = create_candles(trades, :week)
 
-    assert(
-      length(data[:candles]) === 1 and
-        Enum.at(data[:candles], 0)[:open] === Enum.at(trades, 0)[:price] and
-        Enum.at(data[:candles], 0)[:close] === Enum.at(trades, -1)[:price] and
-        Enum.at(data[:candles], 0)[:volume] === trades_total_volume(trades)
-    )
+    assert length(data[:candles]) === 1
+    assert Enum.at(data[:candles], 0)[:open] === Enum.at(trades, 0)[:price]
+    assert Enum.at(data[:candles], 0)[:close] === Enum.at(trades, -1)[:price]
+    assert Enum.at(data[:candles], 0)[:volume] === trades_total_volume(trades)
   end
 
   test "Test two weekly candles" do
@@ -27,25 +25,25 @@ defmodule OHLCStaticWeeklyTest do
     first_candle = Enum.at(data[:candles], 0)
     last_candle = Enum.at(data[:candles], 1)
 
-    assert length(data[:candles]) === 2 and
-             first_candle[:type] === :bearish and
-             first_candle[:open] === 125.54 and
-             first_candle[:high] === 126.877 and
-             first_candle[:low] === 19.3 and
-             first_candle[:close] === 19.3 and
-             first_candle[:volume] === 37.83 and
-             first_candle[:stime] === 1_616_889_600 and
-             first_candle[:etime] === 1_617_580_799 and
-             first_candle[:trades] === 5 and
-             last_candle[:type] === :bullish and
-             last_candle[:open] === 1.0 and
-             last_candle[:high] === 4.0 and
-             last_candle[:low] === 1.0 and
-             last_candle[:close] === 4.0 and
-             last_candle[:volume] === 10.0 and
-             last_candle[:stime] === 1_617_494_400 and
-             last_candle[:etime] === 1_618_185_599 and
-             last_candle[:trades] === 4
+    assert length(data[:candles]) === 2
+    assert first_candle[:type] === :bearish
+    assert first_candle[:open] === 125.54
+    assert first_candle[:high] === 126.877
+    assert first_candle[:low] === 19.3
+    assert first_candle[:close] === 19.3
+    assert first_candle[:volume] === 37.83
+    assert first_candle[:stime] === 1_616_976_000
+    assert first_candle[:etime] === 1_617_580_799
+    assert first_candle[:trades] === 5
+    assert last_candle[:type] === :bullish
+    assert last_candle[:open] === 1.0
+    assert last_candle[:high] === 4.0
+    assert last_candle[:low] === 1.0
+    assert last_candle[:close] === 4.0
+    assert last_candle[:volume] === 10.0
+    assert last_candle[:stime] === 1_617_580_800
+    assert last_candle[:etime] === 1_618_185_599
+    assert last_candle[:trades] === 4
   end
 
   defp single_weekly_candle_1 do

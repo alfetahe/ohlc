@@ -10,18 +10,16 @@ defmodule OHLCStaticMinuteTest do
 
     candle = Enum.at(data[:candles], 0)
 
-    assert(
-      length(data[:candles]) === 1 and
-        candle[:type] === :bullish and
-        candle[:open] === 15.0 and
-        candle[:high] === 167.5 and
-        candle[:low] === 0.3 and
-        candle[:close] === 18.11 and
-        candle[:volume] === 1380.6 and
-        candle[:stime] === 1_616_436_300 and
-        candle[:etime] === 1_616_436_359 and
-        candle[:trades] === 14
-    )
+    assert length(data[:candles]) === 1
+    assert candle[:type] === :bullish
+    assert candle[:open] === 15.0
+    assert candle[:high] === 167.5
+    assert candle[:low] === 0.3
+    assert candle[:close] === 18.11
+    assert candle[:volume] === 1380.6
+    assert candle[:stime] === 1_616_436_300
+    assert candle[:etime] === 1_616_436_359
+    assert candle[:trades] === 14
   end
 
   test "Two one minute candles test" do
@@ -31,27 +29,25 @@ defmodule OHLCStaticMinuteTest do
     first_candle = Enum.at(data[:candles], 0)
     last_candle = Enum.at(data[:candles], 1)
 
-    assert(
-      length(data[:candles]) === 2 and
-        first_candle[:type] === :bullish and
-        first_candle[:open] === 15.0 and
-        first_candle[:high] === 17.9 and
-        first_candle[:low] === 15.0 and
-        first_candle[:close] === 17.9 and
-        first_candle[:volume] === 1.4 and
-        first_candle[:stime] === 1_616_436_240 and
-        first_candle[:etime] === 1_616_436_299 and
-        first_candle[:trades] === 3 and
-        last_candle[:type] === :bullish and
-        last_candle[:open] === 15.0 and
-        last_candle[:high] === 167.5 and
-        last_candle[:low] === 0.3 and
-        last_candle[:close] === 18.11 and
-        last_candle[:volume] === 1380.6 and
-        last_candle[:stime] === 1_616_436_300 and
-        last_candle[:etime] === 1_616_436_359 and
-        last_candle[:trades] === 14
-    )
+    assert length(data[:candles]) === 2
+    assert first_candle[:type] === :bullish
+    assert first_candle[:open] === 15.0
+    assert first_candle[:high] === 17.9
+    assert first_candle[:low] === 15.0
+    assert first_candle[:close] === 17.9
+    assert first_candle[:volume] === 1.4
+    assert first_candle[:stime] === 1_616_436_240
+    assert first_candle[:etime] === 1_616_436_299
+    assert first_candle[:trades] === 3
+    assert last_candle[:type] === :bullish
+    assert last_candle[:open] === 15.0
+    assert last_candle[:high] === 167.5
+    assert last_candle[:low] === 0.3
+    assert last_candle[:close] === 18.11
+    assert last_candle[:volume] === 1380.6
+    assert last_candle[:stime] === 1_616_436_300
+    assert last_candle[:etime] === 1_616_436_359
+    assert last_candle[:trades] === 14
   end
 
   defp single_min_data_1() do

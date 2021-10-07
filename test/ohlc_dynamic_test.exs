@@ -49,18 +49,24 @@ defmodule OHLCDynamicTest do
 
     volume_to_check = trades_total_volume(trades)
 
-    length(data[:candles]) === 1 and
-      Enum.at(data[:candles], 0)[:high] === max_price and
-      Enum.at(data[:candles], 0)[:low] === min_price and
-      Enum.at(data[:candles], 0)[:open] === Enum.at(trades, 0)[:price] and
-      Enum.at(data[:candles], 0)[:close] === Enum.at(trades, -1)[:price] and
-      Enum.at(data[:candles], 0)[:trades] === length(trades) and
-      Enum.at(data[:candles], 0)[:volume] === volume_to_check and
-      Enum.at(data[:candles], 0)[:stime] ===
-        get_time_rounded(Enum.at(trades, -1)[:time], timeframe, type: :down) and
-      Enum.at(data[:candles], 0)[:etime] ===
-        get_time_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp) and
-      Enum.at(data[:candles], 0)[:type] ===
-        get_candle_type(Enum.at(data[:candles], 0)[:open], Enum.at(data[:candles], 0)[:close])
+    assert length(data[:candles]) === 1
+    assert Enum.at(data[:candles], 0)[:high] === max_price
+    assert Enum.at(data[:candles], 0)[:low] === min_price
+    assert Enum.at(data[:candles], 0)[:open] === Enum.at(trades, 0)[:price]
+    assert Enum.at(data[:candles], 0)[:close] === Enum.at(trades, -1)[:price]
+    assert Enum.at(data[:candles], 0)[:trades] === length(trades)
+    assert Enum.at(data[:candles], 0)[:volume] === volume_to_check
+
+    assert Enum.at(data[:candles], 0)[:stime] ===
+             get_time_rounded(Enum.at(trades, -1)[:time], timeframe, type: :down)
+
+    assert Enum.at(data[:candles], 0)[:etime] ===
+             get_time_rounded(Enum.at(trades, -1)[:time], timeframe, format: :stamp)
+
+    assert Enum.at(data[:candles], 0)[:type] ===
+             get_candle_type(
+               Enum.at(data[:candles], 0)[:open],
+               Enum.at(data[:candles], 0)[:close]
+             )
   end
 end
