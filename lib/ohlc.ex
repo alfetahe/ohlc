@@ -214,18 +214,18 @@ defmodule OHLC do
 
   Parameters:
   - `main_candle` - Candle which will be merged into.
-  - `merge_candle` - Candle which will be merged. It is important to
+  - `child_candle` - Candle which will be merged. It is important to
   have etime less than first candle. Meaning both candles should stay
   in the same timeframe.
   """
   @spec merge_child(candle(), candle()) :: {:ok, candle()} | {:error, atom()}
-  def merge_child(main_candle, merge_candle) do
-    if main_candle[:etime] >= merge_candle[:etime] do
-      candle = merge_single_candle(main_candle, merge_candle)
+  def merge_child(main_candle, child_candle) do
+    if main_candle[:etime] >= child_candle[:etime] do
+      candle = merge_single_candle(main_candle, child_candle)
 
       {:ok, candle}
     else
-      {:error, :invalid_candle_order}
+      {:error, :unable_to_merge_child}
     end
   end
 

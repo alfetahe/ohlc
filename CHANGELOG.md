@@ -1,8 +1,7 @@
 
-# Changelog for OHLC v1.1.7
+# Changelog for OHLC v1.1.8
 
-Fixed the weekly candles stime and etime.
-Testing refactoring.
+Fixed bug where new candle generation was created with wrong year number.
 
 
 

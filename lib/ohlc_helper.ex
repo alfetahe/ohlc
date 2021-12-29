@@ -88,8 +88,8 @@ defmodule OHLCHelper do
     {:ok, time_struct} = DateTime.from_unix(timestamp)
 
     candle_time = %DateTime{
-      year: time_struct.year,
-      month: time_struct.month,
+      year: 00,
+      month: 00,
       day: 00,
       hour: 00,
       minute: 00,
@@ -306,7 +306,8 @@ defmodule OHLCHelper do
   defp set_worked_time(worked_timestruct, def_timestruct) do
     %{
       def_timestruct
-      | month: worked_timestruct.month,
+      | year: worked_timestruct.year,
+        month: worked_timestruct.month,
         day: worked_timestruct.day,
         hour: worked_timestruct.hour,
         minute: worked_timestruct.minute,
