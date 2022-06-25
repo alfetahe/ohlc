@@ -10,7 +10,7 @@ Library includes few options for appending candles to existing candles lists and
 
 This library could be useful if you want to create your own charting engine or trading bot.
 
-Documentation can be found here: https://hexdocs.pm/ohlc/1.0.0/OHLC.html
+Documentation can be found here: https://hexdocs.pm/ohlc/1.2.8/OHLC.html
 
 ## Installation
 
@@ -20,7 +20,7 @@ list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ohlc, "~> 1.1"}
+    {:ohlc, "~> 1.2"}
   ]
 end
 ```

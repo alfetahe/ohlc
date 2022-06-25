@@ -5,9 +5,6 @@ defmodule OHLCHelper do
 
   @timeframes [minute: 60, hour: 3600, day: 86_400, week: 604_800]
 
-  # 2021-22-03 00:00:00 UTC +0
-  @base_timestamp 1_616_371_200
-
   @doc """
   Returns all available timeframes in seconds.
   """
@@ -16,6 +13,7 @@ defmodule OHLCHelper do
     @timeframes
   end
 
+  @deprecated "OHLCFactory.gen_empty_candle/1 instead. Will be removed in v2.x."
   @doc """
   Generates and returns empty candle.
 
@@ -24,34 +22,7 @@ defmodule OHLCHelper do
   """
   @spec generate_empty_candle(OHLC.timeframe() | nil) :: OHLC.candle()
   def generate_empty_candle(timeframe \\ nil) do
-    {stime, etime} =
-      case timeframe do
-        nil ->
-          {0, 0}
-
-        _ ->
-          curr_timestamp =
-            DateTime.utc_now()
-            |> DateTime.to_unix()
-
-          {
-            get_time_rounded(curr_timestamp, timeframe, type: :down),
-            get_time_rounded(curr_timestamp, timeframe, type: :up)
-          }
-      end
-
-    %{
-      :open => 0.0,
-      :high => 0.0,
-      :low => 0.0,
-      :close => 0.0,
-      :volume => 0.0,
-      :trades => 0,
-      :stime => stime,
-      :etime => etime,
-      :type => nil,
-      :processed => false
-    }
+    OHLCFactory.gen_empty_candle(timeframe)
   end
 
   @doc """
@@ -115,6 +86,7 @@ defmodule OHLCHelper do
     end
   end
 
+  @deprecated "Use OHLCFactory.gen_trades/1 instead. Will be removed in v2.x."
   @doc """
   Generates trades from provided arguments.
 
@@ -123,8 +95,6 @@ defmodule OHLCHelper do
   Available values are: `:minute`, `:hour`, `:day`, `:week`
   - `min_price` - The minimum price on the generated trades
   - `max_price` - The maximum price on the generated trades
-  - `volume` - The volume each trade has
-  - `volume` - The volume each trade has
   - `volume` - The volume each trade has
   - `timeframe_multiplier` - If you'd like to generate less trades per candle then you can increase the size of
   the timeframe_divider parameter(1-100) otherwise leave empty.
@@ -139,38 +109,14 @@ defmodule OHLCHelper do
         timeframe_multiplier \\ 1,
         timeframe_divider \\ 1
       ) do
-    timeframe_secs = @timeframes[timeframe]
-
-    price_range = (max_price - min_price) |> Float.round(4)
-
-    timestamp_multipled = @base_timestamp + timeframe_secs * timeframe_multiplier
-
-    items_to_loop = ((timeframe_secs - 1) / timeframe_divider) |> trunc()
-
-    Enum.map(1..items_to_loop, fn numb ->
-      numb_multiplied = numb * timeframe_divider
-
-      price =
-        cond do
-          numb === 1 ->
-            max_price
-
-          numb === items_to_loop ->
-            min_price
-
-          true ->
-            (price_range / numb_multiplied + min_price) |> Float.round(4)
-        end
-
-      price = (is_float(price) && Float.round(price, 4)) || price
-      volume = (is_float(volume) && Float.round(volume, 4)) || volume
-
-      [
-        price: price,
-        volume: volume,
-        time: timestamp_multipled + numb_multiplied
-      ]
-    end)
+    OHLCFactory.gen_trades(
+      timeframe: timeframe,
+      min_price: min_price,
+      max_price: max_price,
+      volume: volume,
+      timeframe_multiplier: timeframe_multiplier,
+      timeframe_divider: timeframe_divider
+    )
   end
 
   @doc """
@@ -316,7 +262,7 @@ defmodule OHLCHelper do
   end
 
   defp validate_candles(candles) do
-    empty_candle = generate_empty_candle()
+    empty_candle = OHLCFactory.gen_empty_candle()
 
     data_validated =
       Enum.all?(candles, fn candle ->

@@ -23,4 +23,5 @@ erl_crash.dump
 candloo-*.tar
 
 .vscode
+.tool-versions
 

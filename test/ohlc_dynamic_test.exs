@@ -36,13 +36,13 @@ defmodule OHLCDynamicTest do
     volume = (is_float(volume) && Float.round(volume, 4)) || volume / 1
 
     trades =
-      gen_trades(
-        timeframe,
-        min_price,
-        max_price,
-        volume,
-        timeframe_multiplier,
-        timeframe_divider
+      OHLCFactory.gen_trades(
+        timeframe: timeframe,
+        min_price: min_price,
+        max_price: max_price,
+        volume: volume,
+        timeframe_multiplier: timeframe_multiplier,
+        timeframe_divider: timeframe_divider
       )
 
     {:ok, data} = create_candles(trades, timeframe)

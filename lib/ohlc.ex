@@ -178,7 +178,7 @@ defmodule OHLC do
     candles =
       cond do
         opts[:previous_candle] === %{} or opts[:previous_candle] === nil ->
-          [generate_empty_candle()]
+          [OHLCFactory.gen_empty_candle()]
 
         true ->
           [opts[:previous_candle]]
@@ -392,7 +392,7 @@ defmodule OHLC do
   end
 
   defp forward_candle(last_price, stime, etime) do
-    generate_empty_candle()
+    OHLCFactory.gen_empty_candle()
     |> Map.put(:open, last_price)
     |> Map.put(:close, last_price)
     |> Map.put(:stime, stime)
@@ -404,7 +404,7 @@ defmodule OHLC do
   defp create_candle(trade, timeframe) do
     type = get_candle_type(trade[:price], trade[:price])
 
-    generate_empty_candle()
+    OHLCFactory.gen_empty_candle()
     |> Map.put(:open, trade[:price])
     |> Map.put(:close, trade[:price])
     |> Map.put(:high, trade[:price])
