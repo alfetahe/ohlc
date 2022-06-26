@@ -1,6 +1,9 @@
-[![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=main)
-[![hex.pm version](https://img.shields.io/hexpm/v/coverex.svg?style=flat)](https://hex.pm/packages/ohlc)
 # OHLC
+
+
+![codecov](https://codecov.io/gh/tradebase-technology/ohlc/branch/master/graph/badge.svg)
+
+[![hex.pm version](https://img.shields.io/hexpm/v/coverex.svg?style=flat)](https://hex.pm/packages/ohlc)
 
 Library which can be used to generating OHLC(open, high, low, close) candles from trades.
 
