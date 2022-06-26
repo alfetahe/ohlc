@@ -1,16 +1,18 @@
+[![Coverage Status](https://img.shields.io/coveralls/CleanCut/green.svg?style=flat)](https://coveralls.io/r/CleanCut/green?branch=main)
+[![hex.pm version](https://img.shields.io/hexpm/v/coverex.svg?style=flat)](https://hex.pm/packages/ohlc)
 # OHLC
 
-Library for generating OHLC candles from trades.
+Library which can be used to generating OHLC(open, high, low, close) candles from trades.
 
 
 OHLC takes ordered list of trade events as input and 
 outputs OHLC candles list. 
 
-Library includes few options for appending candles to existing candles lists and more.
+OHLC library also provides helper functions when working with OHLC data.
+Please look at the available modules and their functions in the documentation:
+https://hexdocs.pm/ohlc/1.2.0/OHLC.html
 
 This library could be useful if you want to create your own charting engine or trading bot.
-
-Documentation can be found here: https://hexdocs.pm/ohlc/1.2.8/OHLC.html
 
 ## Installation
 

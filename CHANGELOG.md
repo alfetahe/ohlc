@@ -6,6 +6,8 @@
 ### Added
 - Factory module **OHLCFactory** which can be used to generate data.
 - **gen_candles/3** function to generate OHLC candles.
+- **gen_empty_candle/1** function to generate empty OHLC candle.
+- **gen_trades/1** function to generate trades.
 
 ### Deprecated
 - **OHLCHelper.gen_trades/6** use **OHLCFactory.gen_trades/1 instead**

@@ -36,7 +36,9 @@ defmodule OHLCFactory do
 
     timeframe_secs = OHLCHelper.get_timeframes()[timeframe]
 
-    price_range = (max_price - min_price) |> Float.round(4)
+    price_range = max_price - min_price
+
+    if is_float(price_range), do: Float.round(price_range, 4), else: price_range
 
     timestamp_multipled = @base_timestamp + timeframe_secs * timeframe_multiplier
 
@@ -69,7 +71,7 @@ defmodule OHLCFactory do
   end
 
   @doc """
-  Generates and returns empty candle.
+  Generates empty OHLC candle.
 
   If provided with timeframe stime and etime will be
   generated based on current time.
@@ -139,11 +141,7 @@ defmodule OHLCFactory do
       end
 
     Enum.map(1..amount, fn counter ->
-      updated_stime =
-        cond do
-          counter === 1 -> base_stime
-          true -> base_stime - counter * change_seconds
-        end
+      updated_stime = base_stime - counter * change_seconds
 
       {open, high, low, close, type} =
         gen_ohlc_data(price_direction, base_price, price_change_percentage, counter)
@@ -164,7 +162,7 @@ defmodule OHLCFactory do
     |> Enum.reverse()
   end
 
-  defp percentage_change(initial_val, percentage, type \\ :increase) do
+  defp percentage_change(initial_val, percentage, type) do
     case type do
       :increase -> initial_val / 100 * percentage + initial_val
       :decrease -> initial_val * (1.0 - percentage / 100)
