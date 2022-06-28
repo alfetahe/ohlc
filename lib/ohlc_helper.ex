@@ -145,9 +145,7 @@ defmodule OHLCHelper do
   """
   @spec get_candle_type(number(), number()) :: :bullish | :bearish
   def get_candle_type(open, close) do
-    type = if close > open, do: :bullish, else: :bearish
-
-    type
+    if close > open, do: :bullish, else: :bearish
   end
 
   @doc """

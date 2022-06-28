@@ -1,9 +1,8 @@
 # OHLC
 
+![example workflow](https://github.com/alfetahe/ohlc/actions/workflows/elixir.yml/badge.svg)  [![hex.pm version](https://img.shields.io/hexpm/v/coverex.svg?style=flat)](https://hex.pm/packages/ohlc)
 
-![codecov](https://codecov.io/gh/tradebase-technology/ohlc/branch/master/graph/badge.svg)
 
-[![hex.pm version](https://img.shields.io/hexpm/v/coverex.svg?style=flat)](https://hex.pm/packages/ohlc)
 
 Library which can be used to generating OHLC(open, high, low, close) candles from trades.
 

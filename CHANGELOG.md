@@ -1,6 +1,12 @@
 
 # Change log
 
+## v1.2.1 - 28.06.2022
+
+### Added
+- OHLCHelper test file
+- Github Elixir action for CI
+
 ## v1.2.0 - 26.06.2022
 
 ### Added
