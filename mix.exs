@@ -39,7 +39,7 @@ defmodule OHLC.MixProject do
       # These are the default files included in the package
       files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
       licenses: ["GPL-3.0"],
-      links: %{"GitHub" => "https://github.com/tradebase-technology/ohlc"}
+      links: %{"GitHub" => "https://github.com/alfetahe/ohlc"}
     ]
   end
 end
