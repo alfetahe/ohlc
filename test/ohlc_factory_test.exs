@@ -72,9 +72,9 @@ defmodule OHLCFactoryTest do
 
   test "gen_candles/3 prices increase minute" do
     timeframe = :minute
-    amount = 74
-    base_price = 123.55
-    price_change_percentage = 3.5
+    amount = 1560
+    base_price = 111.9
+    price_change_percentage = 1
     price_direction = :increase
 
     candles =
@@ -83,7 +83,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -107,7 +106,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -131,7 +129,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -155,7 +152,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -179,7 +175,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -203,7 +198,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -227,7 +221,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -251,7 +244,6 @@ defmodule OHLCFactoryTest do
         price_change_percentage: price_change_percentage,
         price_direction: price_direction
       )
-      |> Enum.reverse()
 
     assert validate_candles(
              candles,
@@ -265,7 +257,7 @@ defmodule OHLCFactoryTest do
   test "gen_candles/3 minute rand" do
     timeframe = :minute
     amount = 19
-    candles = gen_candles(timeframe, amount) |> Enum.reverse()
+    candles = gen_candles(timeframe, amount)
 
     assert validate_candles(candles, timeframe)
   end
@@ -273,7 +265,7 @@ defmodule OHLCFactoryTest do
   test "gen_candles/3 hour rand" do
     timeframe = :hour
     amount = 11
-    candles = gen_candles(timeframe, amount) |> Enum.reverse()
+    candles = gen_candles(timeframe, amount)
 
     assert validate_candles(candles, timeframe)
   end
@@ -281,7 +273,7 @@ defmodule OHLCFactoryTest do
   test "gen_candles/3 day rand" do
     timeframe = :day
     amount = 9
-    candles = gen_candles(timeframe, amount) |> Enum.reverse()
+    candles = gen_candles(timeframe, amount)
 
     assert validate_candles(candles, timeframe)
   end
@@ -289,7 +281,7 @@ defmodule OHLCFactoryTest do
   test "gen_candles/3 week rand" do
     timeframe = :week
     amount = 4
-    candles = gen_candles(timeframe, amount) |> Enum.reverse()
+    candles = gen_candles(timeframe, amount)
 
     assert validate_candles(candles, timeframe)
   end
@@ -299,14 +291,15 @@ defmodule OHLCFactoryTest do
          timeframe,
          price_direction \\ :rand,
          base_price \\ 9,
-         price_change_percentage \\ 1
+         price_change_percentage \\ 2
        ) do
     change_seconds = OHLCHelper.get_timeframes()[timeframe]
 
     curr_stamp = DateTime.utc_now() |> DateTime.to_unix()
     base_stime = OHLCHelper.get_time_rounded(curr_stamp, timeframe, type: :down)
 
-    Enum.map_reduce(candles, 1, fn candle, counter ->
+    Enum.map_reduce(candles, {length(candles), base_price}, fn candle,
+                                                               {counter, last_close_price} ->
       updated_stime = base_stime - counter * change_seconds
       etime = OHLCHelper.get_time_rounded(updated_stime, timeframe)
 
@@ -316,41 +309,28 @@ defmodule OHLCFactoryTest do
             true
 
           :increase ->
-            candle[:open] ===
-              base_price / 100 * (price_change_percentage * (counter + 1.1)) + base_price
-
-            candle[:high] ===
-              base_price / 100 * (price_change_percentage * (counter + 1.3)) + base_price
-
-            candle[:low] ===
-              base_price / 100 * (price_change_percentage * (counter + 1)) + base_price
-
-            candle[:close] ===
-              base_price / 100 * (price_change_percentage * (counter + 1.2)) + base_price
-
-            candle[:type] === :bullish
+            candle[:open] === last_close_price &&
+              candle[:high] ===
+                last_close_price / 100 * (price_change_percentage + 1) + last_close_price &&
+              candle[:low] === last_close_price * (1.0 - (price_change_percentage + 1) / 100) &&
+              candle[:close] ===
+                last_close_price / 100 * price_change_percentage + last_close_price &&
+              candle[:type] === :bullish
 
           :decrease ->
-            candle[:open] ===
-              base_price * (1.0 - price_change_percentage * (counter + 1.1) / 100)
-
-            candle[:high] ===
-              base_price * (1.0 - price_change_percentage * (counter + 1.3) / 100)
-
-            candle[:low] ===
-              base_price * (1.0 - price_change_percentage * (counter + 1) / 100)
-
-            candle[:close] ===
-              base_price * (1.0 - price_change_percentage * (counter + 1.2) / 100)
-
-            candle[:type] === :bearish
+            candle[:open] === last_close_price &&
+              candle[:high] ===
+                last_close_price / 100 * (price_change_percentage + 1) + last_close_price &&
+              candle[:low] === last_close_price * (1.0 - (price_change_percentage + 1) / 100) &&
+              candle[:close] === last_close_price * (1.0 - price_change_percentage / 100) &&
+              candle[:type] === :bearish
         end
 
       {
         updated_stime === candle[:stime] &&
           etime === candle[:etime] &&
           price_validations,
-        counter + 1
+        {counter - 1, candle[:close]}
       }
     end)
     |> elem(0)
