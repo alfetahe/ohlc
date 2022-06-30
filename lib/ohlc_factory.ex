@@ -11,6 +11,7 @@ defmodule OHLCFactory do
   @base_volume 9
   @base_trades 9
   @base_price 9
+  @base_price_change_percentage 2
 
   @doc """
   Generates trades from provided arguments.
@@ -122,44 +123,48 @@ defmodule OHLCFactory do
   - `:price_change_percentage` - With each new candle we dynamically update the price
   for each new candle. This price can be higher than the previous candle or lesser.
   With this option you can choose the percentage change for each new candle.
-  Defaults to 1% change with each new candle.
+  Defaults to 2% change with each new candle.
   """
   @spec gen_candles(OHLC.timeframe(), number(), keyword() | nil) :: list()
   def gen_candles(timeframe, amount, opts \\ []) do
-    curr_stamp = DateTime.utc_now() |> DateTime.to_unix()
-    base_stime = OHLCHelper.get_time_rounded(curr_stamp, timeframe, type: :down)
+    base_stime =
+      DateTime.utc_now()
+      |> DateTime.to_unix()
+      |> OHLCHelper.get_time_rounded(timeframe, type: :down)
+
     change_seconds = OHLCHelper.get_timeframes()[timeframe]
     base_price = Keyword.get(opts, :base_price, @base_price)
-    price_change_percentage = Keyword.get(opts, :price_change_percentage, 1)
-    price_direction = Keyword.get(opts, :price_direction, :rand)
 
-    Enum.map(1..amount, fn counter ->
+    price_change_percentage =
+      Keyword.get(opts, :price_change_percentage, @base_price_change_percentage)
+
+    price_dir = Keyword.get(opts, :price_direction, :rand)
+
+    Enum.map_reduce(amount..1, base_price, fn counter, last_close_price ->
       updated_stime = base_stime - counter * change_seconds
 
-      price_direction =
-        if price_direction === :rand do
-          Enum.random([:increase, :decrease])
-        else
-          price_direction
-        end
+      price_dir = if price_dir === :rand, do: Enum.random([:increase, :decrease]), else: price_dir
 
       {open, high, low, close, type} =
-        gen_ohlc_data(price_direction, base_price, price_change_percentage, counter)
+        gen_ohlc_data(price_dir, last_close_price, price_change_percentage)
 
       etime = OHLCHelper.get_time_rounded(updated_stime, timeframe)
 
-      gen_empty_candle(timeframe)
-      |> Map.put(:volume, @base_volume)
-      |> Map.put(:trades, @base_trades)
-      |> Map.put(:stime, updated_stime)
-      |> Map.put(:etime, etime)
-      |> Map.put(:open, open)
-      |> Map.put(:close, close)
-      |> Map.put(:high, high)
-      |> Map.put(:low, low)
-      |> Map.put(:type, type)
+      {
+        gen_empty_candle(timeframe)
+        |> Map.put(:volume, @base_volume)
+        |> Map.put(:trades, @base_trades)
+        |> Map.put(:stime, updated_stime)
+        |> Map.put(:etime, etime)
+        |> Map.put(:open, open)
+        |> Map.put(:close, close)
+        |> Map.put(:high, high)
+        |> Map.put(:low, low)
+        |> Map.put(:type, type),
+        close
+      }
     end)
-    |> Enum.reverse()
+    |> elem(0)
   end
 
   defp percentage_change(initial_val, percentage, type) do
@@ -169,25 +174,20 @@ defmodule OHLCFactory do
     end
   end
 
-  defp gen_ohlc_data(price_direction, base_price, price_change_percentage, counter) do
+  defp gen_ohlc_data(price_direction, base_price, price_change_percentage) do
+    ohlc = {
+      base_price,
+      percentage_change(base_price, price_change_percentage + 1, :increase),
+      percentage_change(base_price, price_change_percentage + 1, :decrease),
+      percentage_change(base_price, price_change_percentage, price_direction)
+    }
+
     case price_direction do
       :increase ->
-        {
-          percentage_change(base_price, price_change_percentage * (counter + 1.1), :increase),
-          percentage_change(base_price, price_change_percentage * (counter + 1.3), :increase),
-          percentage_change(base_price, price_change_percentage * (counter + 1), :increase),
-          percentage_change(base_price, price_change_percentage * (counter + 1.2), :increase),
-          :bullish
-        }
+        Tuple.append(ohlc, :bullish)
 
       :decrease ->
-        {
-          percentage_change(base_price, price_change_percentage * (counter + 1.1), :decrease),
-          percentage_change(base_price, price_change_percentage * (counter + 1), :decrease),
-          percentage_change(base_price, price_change_percentage * (counter + 1.3), :decrease),
-          percentage_change(base_price, price_change_percentage * (counter + 1.2), :decrease),
-          :bearish
-        }
+        Tuple.append(ohlc, :bearish)
     end
   end
 end

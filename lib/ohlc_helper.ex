@@ -13,7 +13,7 @@ defmodule OHLCHelper do
     @timeframes
   end
 
-  @deprecated "OHLCFactory.gen_empty_candle/1 instead. Will be removed in v2.x."
+  @deprecated "Will be removed in v2.x. Use OHLCFactory.gen_empty_candle/1 instead."
   @doc """
   Generates and returns empty candle.
 
@@ -86,7 +86,7 @@ defmodule OHLCHelper do
     end
   end
 
-  @deprecated "Use OHLCFactory.gen_trades/1 instead. Will be removed in v2.x."
+  @deprecated "Will be removed in v2.x. Use OHLCFactory.gen_trades/1 instead."
   @doc """
   Generates trades from provided arguments.
 
