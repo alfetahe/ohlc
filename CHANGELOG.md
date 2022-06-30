@@ -1,6 +1,15 @@
 
 # Change log
 
+## v1.2.2 - 30.06.2022
+### Fixed
+- Fixed OHLCFactory tests when validating the generated candles.
+
+### Changed
+- OHLCFactory generated candles will use the last closing price
+as next candles opening price
+- OHLCFactory default percetage change when generating candles is changed from 1 to 2
+
 ## v1.2.1 - 28.06.2022
 
 ### Added
