@@ -133,15 +133,15 @@ defmodule OHLCFactory do
     price_change_percentage = Keyword.get(opts, :price_change_percentage, 1)
     price_direction = Keyword.get(opts, :price_direction, :rand)
 
-    price_direction =
-      if price_direction === :rand do
-        Enum.random([:increase, :decrease])
-      else
-        price_direction
-      end
-
     Enum.map(1..amount, fn counter ->
       updated_stime = base_stime - counter * change_seconds
+
+      price_direction =
+        if price_direction === :rand do
+          Enum.random([:increase, :decrease])
+        else
+          price_direction
+        end
 
       {open, high, low, close, type} =
         gen_ohlc_data(price_direction, base_price, price_change_percentage, counter)
