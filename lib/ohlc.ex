@@ -1,16 +1,9 @@
 defmodule OHLC do
   @moduledoc """
-  Library for generating OHLC candles from trades.
+  A library that can generate OHLC(open, high, low, close) candles from trade events.
 
-
-  OHLC takes ordered list of trade events as input and
-  outputs OHLC candles list.
-
-  Library includes few options for appending candles to existing candles lists and more.
-
-  This library could be useful if you want to create your own charting engine or trading bot.
-
-  Documentation can be found here: https://hexdocs.pm/ohlc/1.0.0/OHLC.html
+  It supports multiple timeframes including minute, hour, day and week and different configuration
+  options `t:opts/0`.
 
   ## Installation
 
@@ -20,78 +13,67 @@ defmodule OHLC do
   ```elixir
   def deps do
     [
-      {:ohlc, "~> 1.1"}
+      {:ohlc, "~> 1.2"}
     ]
   end
   ```
 
   ## Example usage
-  ```elixir
-  defmodule Example do
-    def calculate_ohlc() do
-      trades = [
-        [price: 12.21, volume: 0.98, time: 1616439921],
-        [price: 12.54, volume: 12.1, time: 1616439931],
-        [price: 12.56, volume: 18.3, time: 1616439952],
-        [price: 18.9, volume: 12, time: 1616440004],
-        [price: 11, volume: 43.1, time: 1616440025],
-        [price: 18.322, volume: 43.1, time: 1616440028]
-      ]
-
-      case OHLC.create_candles(trades, :minute) do
-        {:ok, data} -> IO.inspect data
-        {:error, msg} -> IO.puts msg
-      end
-    end
-  end
-  ```
-
-  ## Example output
-  ```elixir
-  %{
-    candles: [
-      %{
-        close: 12.56,
-        etime: 1616439959,
-        high: 12.56,
-        low: 12.21,
-        open: 12.21,
-        processed: true,
-        stime: 1616439900,
-        trades: 3,
-        type: :bullish,
-        volume: 31.38
-      },
-      %{
-        close: 18.9,
-        etime: 1616440019,
-        high: 18.9,
-        low: 18.9,
-        open: 18.9,
-        processed: true,
-        stime: 1616439960,
-        trades: 1,
-        type: :bearish,
-        volume: 12.0
-      },
-      %{
-        close: 18.322,
-        etime: 1616440079,
-        high: 18.322,
-        low: 11.0,
-        open: 11.0,
-        processed: true,
-        stime: 1616440020,
-        trades: 2,
-        type: :bullish,
-        volume: 86.2
+      iex>trades = [
+      ...>  [price: 12.21, volume: 0.98, time: 1616439921],
+      ...>  [price: 12.54, volume: 12.1, time: 1616439931],
+      ...>  [price: 12.56, volume: 18.3, time: 1616439952],
+      ...>  [price: 18.9, volume: 12, time: 1616440004],
+      ...>  [price: 11, volume: 43.1, time: 1616440025],
+      ...>  [price: 18.322, volume: 43.1, time: 1616440028]
+      ...>]
+      ...>
+      ...>OHLC.create_candles(trades, :minute)
+      {
+        :ok,
+        %{
+          candles: [
+            %{
+              close: 12.56,
+              etime: 1616439959,
+              high: 12.56,
+              low: 12.21,
+              open: 12.21,
+              processed: true,
+              stime: 1616439900,
+              trades: 3,
+              type: :bullish,
+              volume: 31.38
+            },
+            %{
+              close: 18.9,
+              etime: 1616440019,
+              high: 18.9,
+              low: 18.9,
+              open: 18.9,
+              processed: true,
+              stime: 1616439960,
+              trades: 1,
+              type: :bearish,
+              volume: 12.0
+            },
+            %{
+              close: 18.322,
+              etime: 1616440079,
+              high: 18.322,
+              low: 11.0,
+              open: 11.0,
+              processed: true,
+              stime: 1616440020,
+              trades: 2,
+              type: :bullish,
+              volume: 86.2
+            }
+          ],
+          pair: nil,
+          timeframe: :minute
+        }
       }
-    ],
-    pair: nil,
-    timeframe: :minute
-  }
-  ```
-
   """
 
   import OHLCHelper
@@ -139,13 +121,13 @@ defmodule OHLC do
   @typedoc """
   Available options for `create_candles/3`
   - `:forward_fill` - When set true copies the previous candles closing price
-  to the next candle if no trades happend to be in between.
+  to the next candle if no trades happened to be in between.
   Useful when you don't want to get empty time gap between the generated candles.
   - `:validate_trades` - When set true all trades are being validated before
   generating the candles to avoid errors and misinformation.
   - `:previous_candle` - Trades are appended to the previous candle if possible
-  before generating the new candles.
-  - `:pair` - Adds the pair name to the returned outputs metadata.
+  before generating the new candles. Useful if you want to update existing candle.
+  - `:pair` - Adds the asset pair name to the returned outputs metadata.
   """
   @type opts :: [
           {:forward_fill, boolean()}
@@ -158,13 +140,56 @@ defmodule OHLC do
   Function for generating candles from trades and timeframe provided.
 
   Parameters:
-  - `trades` - A list containing all the trades. Trades must be
+  - `t:trades/0` - A list containing all the trades. Trades must be
   chronologically arranged(ASC) by the timestamp field.
-  - `timeframe` - Timeframe for the candles.
-  - `opts` - Option values for the data proccessing.
+  - `t:timeframe/0` - Timeframe for the candles.
+  - `t:opts/0` - Option values for the data proccessing.
 
   Returns a tuple containing the metadata for the candles and a list
   of generated candles.
+
+  ## Example
+
+      iex>trades = [
+      ...>  [price: 0.12, volume: 542.98, time: 1668108995],
+      ...>  [price: 0.14, volume: 212.1, time: 1668108998],
+      ...>  [price: 0.17, volume: 532.77, time: 1668112595],
+      ...>  [price: 0.21, volume: 123.8, time: 1668112623]
+      ...>]
+      ...>
+      ...>OHLC.create_candles(trades, :hour, [pair: "BTC/EUR", validate_trades: true])
+      {
+        :ok,
+        %{
+          candles: [
+            %{
+              close: 0.14, etime: 1668110399,
+              high: 0.14, low: 0.12,
+              open: 0.12,
+              processed: true,
+              stime: 1668106800,
+              trades: 2,
+              type: :bullish,
+              volume: 755.08
+            },
+            %{
+              close: 0.21,
+              etime: 1668113999,
+              high: 0.21,
+              low: 0.17,
+              open: 0.17,
+              processed: true,
+              stime: 1668110400,
+              trades: 2,
+              type: :bullish,
+              volume: 656.57
+            }
+          ],
+          pair: "BTC/EUR",
+          timeframe: :hour
+        }
+      }
+
   """
   @spec create_candles(trades(), timeframe(), opts() | nil) ::
           {:ok,
@@ -198,6 +223,36 @@ defmodule OHLC do
   then the provided timeframe cannot be :minute.
 
   Returns a tuple containing the list of candles with converted timeframe.
+
+  ## Example
+
+      iex>trades = [
+      ...>  [price: 0.12, volume: 542.98, time: 1668108995],
+      ...>  [price: 0.14, volume: 212.1, time: 1668108998],
+      ...>  [price: 0.17, volume: 532.77, time: 1668112595],
+      ...>  [price: 0.21, volume: 123.8, time: 1668112623]
+      ...>]
+      ...>
+      ...>{:ok, %{candles: candles}} = OHLC.create_candles(trades, :minute)
+      ...>OHLC.convert_timeframe(candles, :day)
+      {
+        :ok,
+        [
+          %{
+            close: 0.21,
+            etime: 1668124799,
+            high: 0.21,
+            low: 0.12,
+            open: 0.12,
+            processed: true,
+            stime: 1668038400,
+            trades: 4,
+            type: :bullish,
+            volume: 1411.65
+          }
+        ]
+      }
+
   """
   @spec convert_timeframe(candles(), timeframe()) :: {:ok, candles()}
   def convert_timeframe(candles, timeframe) do
@@ -215,8 +270,39 @@ defmodule OHLC do
   Parameters:
   - `main_candle` - Candle which will be merged into.
   - `child_candle` - Candle which will be merged. It is important to
-  have etime less than first candle. Meaning both candles should stay
+  have etime less than or equal to the main candle. Meaning both candles should stay
   in the same timeframe.
+
+  ## Example
+
+      iex>trades1 = [
+      ...>  [price: 0.12, volume: 542.98, time: 1668108995],
+      ...>  [price: 0.14, volume: 212.1, time: 1668108998]
+      ...>]
+      ...>trades2 = [
+      ...>  [price: 0.17, volume: 532.77, time: 1668112595],
+      ...>  [price: 0.21, volume: 123.8, time: 1668112623]
+      ...>]
+      ...>{:ok, %{candles: candles1}} = OHLC.create_candles(trades1, :week)
+      ...>{:ok, %{candles: candles2}} = OHLC.create_candles(trades2, :week)
+      ...>OHLC.merge_child(List.first(candles1), List.first(candles2))
+      {
+        :ok,
+        %{
+          close: 0.21,
+          etime: 1668383999,
+          high: 0.21,
+          low: 0.12,
+          open: 0.12,
+          processed: true,
+          stime: 1667779200,
+          trades: 4,
+          type: :bullish,
+          volume: 1411.65
+        }
+      }
+
+
   """
   @spec merge_child(candle(), candle()) :: {:ok, candle()} | {:error, atom()}
   def merge_child(main_candle, child_candle) do

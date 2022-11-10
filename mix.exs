@@ -4,14 +4,15 @@ defmodule OHLC.MixProject do
   def project do
     [
       app: :ohlc,
-      version: "1.2.2",
+      version: "1.2.3",
       elixir: "~> 1.4",
       description: description(),
       package: package(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test]
+      preferred_cli_env: [coveralls: :test],
+      docs: docs()
     ]
   end
 
@@ -30,8 +31,15 @@ defmodule OHLC.MixProject do
     ]
   end
 
+  defp docs do
+    [
+      extras: ["README.md"],
+      main: "readme"
+    ]
+  end
+
   defp description() do
-    "Package for generating OHLC candles from trades."
+    "Package for generating OHLC(open, high, low, close) candles from trades events."
   end
 
   defp package() do

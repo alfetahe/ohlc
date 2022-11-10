@@ -1,6 +1,9 @@
 
 # Change log
 
+## v1.2.3 - 11.11.2022
+### Added doctests and updated documentation.
+
 ## v1.2.2 - 30.06.2022
 ### Fixed
 - Fixed OHLCFactory tests when validating the generated candles.
