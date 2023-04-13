@@ -1,6 +1,10 @@
 
 # Change log
 
+## v1.2.4 - 13.04.2022
+### Added more unit tests.
+### Updated readme file.
+
 ## v1.2.3 - 11.11.2022
 ### Added doctests and updated documentation.
 

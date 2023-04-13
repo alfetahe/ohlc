@@ -8,6 +8,9 @@ A library that can generate OHLC(open, high, low, close) candles from trade even
 It supports multiple timeframes including minute, hour, day and week and different configuration
 options `OHLC.opts()`.
 
+All generated dates and times are in UTC +0 timezone.
+The library is using the built in module `DateTime` which handles the timezones.
+
 OHLC library also provides helper functions when working with OHLC data.
 Please look at the available modules and their functions in the documentation:
 https://hexdocs.pm/ohlc
