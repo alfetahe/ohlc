@@ -56,6 +56,39 @@ defmodule OHLCStaticDailyTest do
     assert last_candle[:trades] === 4
   end
 
+  test "Test 3 daily candles with forward fill false" do
+    trades = multiple_daily_candle_1()
+
+    {:ok, data} = create_candles(trades, :day, forward_fill: false)
+
+    first_candle = Enum.at(data[:candles], 0)
+    second_candle = Enum.at(data[:candles], 1)
+    third_candle = Enum.at(data[:candles], 2)
+
+    assert length(data[:candles]) === 3
+
+    assert first_candle[:type] === :bullish
+    assert first_candle[:low] === 0.97
+    assert first_candle[:high] === 1.1
+    assert first_candle[:open] === 0.98
+    assert first_candle[:close] === 1.1
+    assert first_candle[:volume] === 690.32
+
+    assert second_candle[:type] === :bearish
+    assert second_candle[:low] === 1.1
+    assert second_candle[:high] === 1.2
+    assert second_candle[:open] === 1.2
+    assert second_candle[:close] === 1.1
+    assert second_candle[:volume] === 264.2
+
+    assert third_candle[:type] === :bullish
+    assert third_candle[:low] === 1.12
+    assert third_candle[:high] === 1.456
+    assert third_candle[:open] === 1.12
+    assert third_candle[:close] === 1.456
+    assert third_candle[:volume] === 206.04
+  end
+
   defp single_daily_candle_1 do
     [
       [price: 125.54, volume: 0.1, time: 1_616_633_999],
@@ -72,6 +105,19 @@ defmodule OHLCStaticDailyTest do
       [price: 0.43, volume: 1.4, time: 1_616_852_902],
       [price: 0.4, volume: 1.9, time: 1_616_868_022],
       [price: 0.3, volume: 15, time: 1_616_882_362]
+    ]
+  end
+
+  defp multiple_daily_candle_1 do
+    [
+      [price: 0.98, volume: 150.12, time: 1_681_399_134],
+      [price: 0.97, volume: 340.2, time: 1_681_391_934],
+      [price: 1.1, volume: 200, time: 1_681_398_752],
+      [price: 1.2, volume: 152.2, time: 1_681_438_325],
+      [price: 1.1, volume: 112, time: 1_681_438_565],
+      [price: 1.12, volume: 50.4, time: 1_681_517_635],
+      [price: 1.23, volume: 154.64, time: 1_681_550_161],
+      [price: 1.456, volume: 1, time: 1_681_589_461]
     ]
   end
 end
