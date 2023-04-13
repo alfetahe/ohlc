@@ -24,6 +24,7 @@ def deps do
   [
     {:ohlc, "~> 1.2"}
   ]
+end
 ```
 
 ## Example usage
